@@ -1,0 +1,24 @@
+{
+	"G": "player",
+	"f": "obstacle",
+	"y": "danger"
+}
+
+BEGINLEVEL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      G                T
+fffffffffffffffffffffyyyfffffffffffffffff
