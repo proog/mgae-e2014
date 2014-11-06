@@ -99,7 +99,3 @@ function fileSelected(event) {
 
     reader.readAsText(file);
 }
-
-function init() {
-    document.getElementById('fileInput').addEventListener('change', fileSelected, false);
-}

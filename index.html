@@ -9,8 +9,8 @@
     <script src="js/common.js"></script>
     <script src="js/parser.js"></script>
 </head>
-<body onload="init();">
-<input type="file" id="fileInput">
+<body>
+<input type="file" id="fileInput" onchange="fileSelected(event);">
 <div id="gameContainer">
     <canvas id="gameCanvas" width="800" height="600"></canvas>
 </div>
