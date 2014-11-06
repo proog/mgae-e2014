@@ -1,5 +1,9 @@
 function Parser() {
     this.objects = [];
+    this.world = {
+        width: 0,
+        height: 0
+    };
     this.definitions = [];
     this.separator = '\nBEGINLEVEL';
     this.textRoles = {
@@ -55,6 +59,8 @@ function Parser() {
         this.objects = [];
 
         for(var row = 0; row < lines.length; row++) {
+            this.world.height = row;
+
             var line = lines[row];
 
             for(var col = 0; col < line.length; col++) {
@@ -70,6 +76,9 @@ function Parser() {
                 var role = this.textRoles[textRole] ? this.textRoles[textRole] : Common.roles.PASSIVE;
                 var object = this.makeObject(char, col, row, role);
                 this.objects.push(object);
+
+                if(col > this.world.width)
+                    this.world.width = col;
             }
         }
 
@@ -85,6 +94,7 @@ function fileSelected(event) {
         var parser = new Parser();
         parser.parse(reader.result);
         console.log(parser.objects);
+        console.log(parser.world);
     };
 
     reader.readAsText(file);
