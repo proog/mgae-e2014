@@ -73,7 +73,7 @@ function Parser() {
                 // fallback to default defs if not found in user-defined
                 var textRole = defs[char] ? defs[char].toLowerCase() : this.defaultDefinitions[char];
 
-                var role = this.textRoles[textRole] ? this.textRoles[textRole] : Common.roles.PASSIVE;
+                var role = this.textRoles[textRole] ? this.textRoles[textRole] : Common.roles.OBSTACLE;
                 var object = this.makeObject(char, col, row, role);
                 this.objects.push(object);
 
