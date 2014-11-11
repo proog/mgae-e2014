@@ -8,3 +8,7 @@ Common.roles = {
     PASSIVE: 6,
     COLLECTIBLE: 7
 };
+Common.tileSize = {
+    width: 30,
+    height: 30
+};
