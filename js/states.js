@@ -25,6 +25,8 @@ function createWorld(world, objects) {
 
                 this.gameObjects.push(object);
             }
+
+            gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
         },
         draw: function(t){
             var dimensions = gamvas.getCanvasDimension();
@@ -35,6 +37,8 @@ function createWorld(world, objects) {
             for(var i = 0; i < this.gameObjects.length; i++) {
                 this.gameObjects[i].draw(t);
             }
+
+            gamvas.physics.drawDebug();
         }
     });
 }

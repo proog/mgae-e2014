@@ -13,6 +13,14 @@ obstacleActor = baseActor.extend({
 
         this.addState(new obstacleActorState('obstacle'));
         this.setState('obstacle');
+
+        this.friction = 0;
+        this.restitution = 0;
+
+        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+                this.object.size.width * Common.tileSize.width,
+                this.object.size.height * Common.tileSize.height,
+                gamvas.physics.STATIC);
     }
 });
 
@@ -22,5 +30,20 @@ playerActor = baseActor.extend({
 
         this.addState(new playerActorState('player'));
         this.setState('player');
+
+        this.friction = 0;
+        this.restitution = 0;
+        this.canJump = false;
+
+        /*this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+                this.object.size.width * Common.tileSize.width,
+                this.object.size.height * Common.tileSize.height,
+                gamvas.physics.DYNAMIC);*/
+
+        this.bodyCircle(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+                this.object.size.width * Common.tileSize.width / 2,
+            gamvas.physics.DYNAMIC);
+
+        this.setFixedRotation(true);
     }
 });
