@@ -1,7 +1,7 @@
 function createWorld(world, objects) {
     return gamvas.State.extend({
         init: function() {
-            var size = indexToPosition(world.height, world.width);
+            var size = indexToWorldPosition(world.height, world.width);
             this.worldDimensions = {
                 width: size.x + Common.tileSize.width,
                 height: size.y + Common.tileSize.height

@@ -5,3 +5,7 @@ function indexToPosition(row, col){
 
     return {"x": Common.tileSize.width * col - offsetx, "y": Common.tileSize.height * row - offsety};
 }
+
+function indexToWorldPosition(row, col){
+    return {"x": Common.tileSize.width * col, "y": Common.tileSize.height * row};
+}

@@ -30,10 +30,52 @@ obstacleActorState = baseActorState.extend({
 playerActorState = baseActorState.extend({
     init: function() {
         this._super();
+        this.worldDimensions = gamvas.state.getCurrentState().worldDimensions;
+        var canvasDim = gamvas.getCanvasDimension();
+        this.cameraBounds = {
+            left: Math.floor(canvasDim.w / 2),
+            right: Math.floor(Math.min(this.worldDimensions.width, canvasDim.w) - (canvasDim.w / 2)),
+            top: Math.floor(canvasDim.h / 2),
+            bottom: Math.floor(Math.min(this.worldDimensions.height, canvasDim.h) - (canvasDim.h / 2))
+        };
+        this.camera = gamvas.state.getCurrentState().camera;
     },
     update: function(t) {
-        // listen for input and move actor
-        // check for collisions
+        //Player movement
+        if (gamvas.key.isPressed(gamvas.key.UP)) {
+            this.actor.move(0, -Common.playerVars.SPEED*t);
+        }
+
+        if (gamvas.key.isPressed(gamvas.key.DOWN)) {
+            this.actor.move(0, Common.playerVars.SPEED*t);
+        }
+
+        if (gamvas.key.isPressed(gamvas.key.LEFT)) {
+            this.actor.move(-Common.playerVars.SPEED*t, 0);
+        }
+
+        if (gamvas.key.isPressed(gamvas.key.RIGHT)) {
+            this.actor.move(Common.playerVars.SPEED*t, 0);
+        }
+
+        if(this.actor.position.x < 0){
+            this.actor.position.x = 0;
+        }
+        else if(this.actor.position.x >= this.worldDimensions.width - Common.tileSize.width){
+            this.actor.position.x = this.worldDimensions.width - Common.tileSize.width;
+        }
+
+        if(this.actor.position.y < 0){
+            this.actor.position.y = 0;
+        }
+        else if(this.actor.position.y >= this.worldDimensions.height - Common.tileSize.height){
+            this.actor.position.y = this.worldDimensions.height - Common.tileSize.height;
+        }
+
+        //Camera movement
+        var cameraPositionX = Math.max(Math.min(this.actor.position.x, this.cameraBounds.right), this.cameraBounds.left);
+        var cameraPositionY = Math.max(Math.min(this.actor.position.y, this.cameraBounds.bottom), this.cameraBounds.top);
+        this.camera.setPosition(cameraPositionX, cameraPositionY);
     },
     draw: function(t) {
         this._super(t);

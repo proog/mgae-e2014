@@ -2,7 +2,7 @@ baseActor = gamvas.Actor.extend({
     create: function(name, object) {
         this.object = object;
 
-        var pos = indexToPosition(object.position.row, object.position.col);
+        var pos = indexToWorldPosition(object.position.row, object.position.col);
         this._super(name, pos.x, pos.y);
     }
 });

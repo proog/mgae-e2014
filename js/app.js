@@ -2,6 +2,8 @@ gamvas.event.addOnLoad(function() {
 
 });
 
+gamvas.config.preventKeyEvents = true;
+
 function fileSelected(event) {
     var file = event.target.files[0];
 

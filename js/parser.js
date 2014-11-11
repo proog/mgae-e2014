@@ -67,7 +67,7 @@ function Parser() {
                 var char = line[col].toString();
 
                 // ignore whitespace
-                if(char == ' ')
+                if(char == ' ' || char == '\r')
                     continue;
 
                 // fallback to default defs if not found in user-defined
