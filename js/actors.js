@@ -24,6 +24,15 @@ obstacleActor = baseActor.extend({
     }
 });
 
+enemyActor = baseActor.extend({
+    create: function(name, object) {
+        this._super(name, object);
+        this.addState(new enemyActorPatrollingState('patrolling'));
+        this.addState(new enemyActorChasingState('chasing'));
+        this.setState('patrolling');
+    }
+})
+
 playerActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);

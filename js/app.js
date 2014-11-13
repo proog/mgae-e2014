@@ -2,7 +2,8 @@ gamvas.event.addOnLoad(function() {
     var testlevel = '{\
 "G": "player",\n\
 "f": "obstacle",\n\
-"y": "danger"\n\
+"y": "danger",\n\
+"e": "enemy"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
@@ -21,7 +22,7 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-   G                     T\n\
+   G        e             T\n\
 ffffffffff     fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\

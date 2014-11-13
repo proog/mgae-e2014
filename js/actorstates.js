@@ -29,6 +29,49 @@ obstacleActorState = baseActorState.extend({
     }
 });
 
+//baseEnemyActorState
+
+enemyActorPatrollingState = baseActorState.extend({
+    init: function(){
+        this._super();
+        this.bound = 50;
+        this.timeThreshold = 3;
+        this.timeSpent = 0;
+        this.directionX = -1;
+        this.speed = 100;
+        this.velocity = 0;
+    },
+    update: function(t){
+        this.timeSpent += t;
+        this.velocity = this.speed * this.directionX * t;
+        if(this.timeSpent > this.timeThreshold){
+            console.log("switching enemy direction");
+            this.directionX = this.directionX > 0 ? -1 : 1;
+            this.timeSpent = 0;
+        }
+        this.actor.move(this.velocity, 0);
+    },
+    draw: function(t){
+        this._super(t);
+    }
+})
+
+enemyActorChasingState = baseActorState.extend({
+    init: function(){
+        this._super();
+        this.direction = 1;
+        this.speed = 100;
+        this.velocity = 0;
+        this.targetPositionX = 0;
+    },
+    update: function(t){
+
+    },
+    draw: function(t){
+        this._super(t);
+    }
+})
+
 playerActorState = baseActorState.extend({
     init: function() {
         this._super();

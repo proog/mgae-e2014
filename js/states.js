@@ -18,6 +18,9 @@ function createWorld(world, objects) {
                     case Common.roles.PLAYER:
                         object = new playerActor('gameObject' + i, objects[i]);
                         break;
+                    case Common.roles.ENEMY:
+                        object = new enemyActor('gameObject' + i, objects[i]);
+                        break;
                     default:
                         object = new obstacleActor('gameObject' + i, objects[i]);
                         break;
