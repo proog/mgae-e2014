@@ -23,7 +23,7 @@ BEGINLEVEL\n\
 \n\
 \n\
    G        e             T\n\
-ffffffffff     fffffffffffffffffffffffffffffffffffffffff\n\
+ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\
 \n\

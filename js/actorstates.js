@@ -136,10 +136,8 @@ playerActorState = baseActorState.extend({
     onCollisionEnter: function(other) {
         if(other.object.role == Common.roles.OBSTACLE)
             this.actor.canJump = true;
-        else if(other.object.role == Common.roles.DANGER || other.object.role == Common.roles.ENEMY) {
+        else if(other.object.role == Common.roles.DANGER || other.object.role == Common.roles.ENEMY)
             this.actor.isDead = true;
-            gamvas.state.getCurrentState().isDead = true;
-        }
     },
     onCollisionLeave: function(other) {
         this.actor.canJump = false;

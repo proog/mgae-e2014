@@ -17,7 +17,6 @@ function createWorld(world, objects) {
             };
 
             for(var i = 0; i < objects.length; i++) {
-                var object;
                 switch(objects[i].role) {
                     case Common.roles.OBSTACLE:
                         this.gameObjects.obstacles.push(new obstacleActor('obstacleActor' + (this.gameObjects.obstacles.length), objects[i]));
@@ -44,28 +43,26 @@ function createWorld(world, objects) {
         },
         draw: function(t) {
             var dimensions = gamvas.getCanvasDimension();
-
-            this.c.fillStyle = '#ff0000';
-            this.c.fillRect(0, 0, dimensions.w, dimensions.h);
+            var pos = this.camera.position;
+            this.c.fillStyle = 'pink';
+            this.c.fillRect(pos.x - dimensions.w/2, pos.y - dimensions.h/2, dimensions.w, dimensions.h);
 
              for(var gameObject in this.gameObjects){
-             if(gameObject == "player"){
-             this.gameObjects.player.draw(t);
-             } else {
-             for(var i = 0; i < this.gameObjects[gameObject].length; i++){
-             this.gameObjects[gameObject][i].draw(t);
+                 if(gameObject == 'player'){
+                    this.gameObjects.player.draw(t);
+                 }
+                 else {
+                    for(var i = 0; i < this.gameObjects[gameObject].length; i++){
+                        this.gameObjects[gameObject][i].draw(t);
+                    }
+                 }
              }
-             }
-             }/*
-             for(var i = 0; i < this.gameObjects.length; i++) {
-             this.gameObjects[i].draw(t);
-             }*/
 
             gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
             // handle player death
-            if(!this.isDead) {
+            if(this.gameObjects.player.isDead) {
                 this.c.fillStyle = '#ff0000';
                 this.c.font = 'normal 70px consolas';
                 this.c.textAlign = 'center';
