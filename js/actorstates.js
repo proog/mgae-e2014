@@ -29,24 +29,48 @@ obstacleActorState = baseActorState.extend({
     }
 });
 
-enemyActorPatrollingState = baseActorState.extend({
-    init: function(){
+baseEnemyActorState = baseActorState.extend({
+    init: function() {
         this._super();
-        this.bound = 50;
         this.timeThreshold = 3;
-        this.timeSpent = 0;
+        this.patrollingBound = 2; //number of tiles on either side
         this.directionX = -1;
-        this.speed = 100;
+        this.timeSpent = 0;
+        this.speed = 40;
         this.velocity = 0;
+        this.chaseDistance = 4; //number of tiles
+        this.basePatrollingPositionX = this.actor.position.x;
+        this.target = gamvas.state.getCurrentState().gameObjects.player;
     },
     update: function(t){
-        this.timeSpent += t;
+
+    },
+    draw: function(t){
+        this._super(t);
+    }
+});
+
+enemyActorPatrollingState = baseEnemyActorState.extend({
+    init: function(){
+        this._super();
+    },
+    update: function(t){
+        if(Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistance * Common.tileSize.width){
+            console.log("You lookin' at me?!");
+            this.actor.setState("chasing");
+            return;
+        }
+        if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
+            this.directionX = -this.directionX;
+            console.log("switching enemy direction");
+        }
+        //this.timeSpent += t;
         this.velocity = this.speed * this.directionX * t;
-        if(this.timeSpent > this.timeThreshold){
+        /*if(this.timeSpent > this.timeThreshold){
             console.log("switching enemy direction");
             this.directionX = this.directionX > 0 ? -1 : 1;
             this.timeSpent = 0;
-        }
+        }*/
         this.actor.move(this.velocity, 0);
     },
     draw: function(t){
@@ -54,16 +78,24 @@ enemyActorPatrollingState = baseActorState.extend({
     }
 });
 
-enemyActorChasingState = baseActorState.extend({
+enemyActorChasingState = baseEnemyActorState.extend({
     init: function(){
         this._super();
-        this.direction = 1;
-        this.speed = 100;
-        this.velocity = 0;
-        this.targetPositionX = 0;
     },
     update: function(t){
-
+        if(Math.abs(this.target.position.x - this.actor.position.x) > this.chaseDistance * Common.tileSize.width) {
+            console.log("Hmpf, I'll let you go this time");
+            this.actor.setState("patrolling");
+            this.actor.getCurrentState().basePatrollingPositionX = this.actor.position.x;
+            return;
+        }
+        if(this.target.position.x < this.actor.position.x){
+            this.direction = -1;
+        } else {
+            this.direction = 1;
+        }
+        this.velocity = this.speed * this.direction * t;
+        this.actor.move(this.velocity, 0);
     },
     draw: function(t){
         this._super(t);
