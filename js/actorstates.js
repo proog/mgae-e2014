@@ -29,6 +29,18 @@ obstacleActorState = baseActorState.extend({
     }
 });
 
+dangerActorState = baseActorState.extend({
+    init: function() {
+        this._super();
+    },
+    update: function(t) {
+
+    },
+    draw: function(t) {
+        this._super(t);
+    }
+});
+
 playerActorState = baseActorState.extend({
     init: function() {
         this._super();
@@ -81,7 +93,12 @@ playerActorState = baseActorState.extend({
         return true;
     },
     onCollisionEnter: function(other) {
-        this.actor.canJump = true;
+        if(other.object.role == Common.roles.OBSTACLE)
+            this.actor.canJump = true;
+        else if(other.object.role == Common.roles.DANGER || other.object.role == Common.roles.ENEMY) {
+            this.actor.isDead = true;
+            gamvas.state.getCurrentState().isDead = true;
+        }
     },
     onCollisionLeave: function(other) {
         this.actor.canJump = false;

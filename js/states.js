@@ -18,6 +18,12 @@ function createWorld(world, objects) {
                     case Common.roles.PLAYER:
                         object = new playerActor('gameObject' + i, objects[i]);
                         break;
+                    case Common.roles.DANGER:
+                        object = new dangerActor('gameObject' + i, objects[i]);
+                        break;
+                    case Common.roles.PASSIVE:
+                        object = new passiveActor('gameObject' + i, objects[i]);
+                        break;
                     default:
                         object = new obstacleActor('gameObject' + i, objects[i]);
                         break;
@@ -28,17 +34,28 @@ function createWorld(world, objects) {
 
             gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
         },
-        draw: function(t){
+        draw: function(t) {
             var dimensions = gamvas.getCanvasDimension();
 
             this.c.fillStyle = '#ff0000';
-            this.c.fillRect(-dimensions.w/2, -dimensions.h/2, dimensions.w, dimensions.h);
+            this.c.fillRect(0, 0, dimensions.w, dimensions.h);
 
             for(var i = 0; i < this.gameObjects.length; i++) {
                 this.gameObjects[i].draw(t);
             }
 
             gamvas.physics.drawDebug();
+        },
+        postDraw: function(t) {
+            // handle player death
+            if(!this.isDead) {
+                this.c.fillStyle = '#ff0000';
+                this.c.font = 'normal 70px consolas';
+                this.c.textAlign = 'center';
+
+                var pos = gamvas.getCanvasDimension();
+                this.c.fillText('YOU DIED', pos.w/2, pos.h/2);
+            }
         }
     });
 }

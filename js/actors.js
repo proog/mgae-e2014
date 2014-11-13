@@ -47,3 +47,37 @@ playerActor = baseActor.extend({
         this.setFixedRotation(true);
     }
 });
+
+dangerActor = baseActor.extend({
+    create: function(name, object) {
+        this._super(name, object);
+
+        this.addState(new dangerActorState('danger'));
+        this.setState('danger');
+
+        this.friction = 0;
+        this.restitution = 0;
+
+        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+                this.object.size.width * Common.tileSize.width,
+                this.object.size.height * Common.tileSize.height,
+            gamvas.physics.STATIC);
+    }
+});
+
+passiveActor = baseActor.extend({
+    create: function(name, object) {
+        this._super(name, object);
+
+        this.addState(new baseActorState('passive'));
+        this.setState('passive');
+
+        this.friction = 0;
+        this.restitution = 0;
+
+        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+                this.object.size.width * Common.tileSize.width,
+                this.object.size.height * Common.tileSize.height,
+            gamvas.physics.STATIC);
+    }
+});
