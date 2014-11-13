@@ -7,41 +7,72 @@ function createWorld(world, objects) {
                 height: size.y + Common.tileSize.height
             };
 
-            this.gameObjects = [];
+            this.gameObjects = {
+                player: null,
+                obstacles: [],
+                dangers: [],
+                enemies: [],
+                collectibles: [],
+                passives: []
+            };
 
             for(var i = 0; i < objects.length; i++) {
                 var object;
                 switch(objects[i].role) {
                     case Common.roles.OBSTACLE:
-                        object = new obstacleActor('gameObject' + i, objects[i]);
+                        this.gameObjects.obstacles.push(new obstacleActor('obstacleActor' + (this.gameObjects.obstacles.length), objects[i]));
                         break;
                     case Common.roles.PLAYER:
-                        object = new playerActor('gameObject' + i, objects[i]);
+                        this.gameObjects.player = new playerActor('playerActor', objects[i]);
                         break;
                     case Common.roles.ENEMY:
-                        object = new enemyActor('gameObject' + i, objects[i]);
+                        this.gameObjects.enemies.push(new enemyActor('enemyActor' + (this.gameObjects.enemies.length), objects[i]));
+                        break;
+                    case Common.roles.DANGER:
+                        this.gameObjects.dangers.push(new dangerActor('dangerActor' + (this.gameObjects.dangers.length), objects[i]));
+                        break;
+                    case Common.roles.PASSIVE:
+                        this.gameObjects.passives.push(new passiveActor('passiveActor' + (this.gameObjects.passives.length), objects[i]));
                         break;
                     default:
-                        object = new obstacleActor('gameObject' + i, objects[i]);
+                        this.gameObjects.obstacles.push(new obstacleActor('obstacleActor' + (this.gameObjects.obstacles.length), objects[i]));
                         break;
                 }
-
-                this.gameObjects.push(object);
             }
 
             gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
         },
-        draw: function(t){
+        draw: function(t) {
             var dimensions = gamvas.getCanvasDimension();
 
             this.c.fillStyle = '#ff0000';
-            this.c.fillRect(-dimensions.w/2, -dimensions.h/2, dimensions.w, dimensions.h);
+            this.c.fillRect(0, 0, dimensions.w, dimensions.h);
 
-            for(var i = 0; i < this.gameObjects.length; i++) {
-                this.gameObjects[i].draw(t);
-            }
+             for(var gameObject in this.gameObjects){
+             if(gameObject == "player"){
+             this.gameObjects.player.draw(t);
+             } else {
+             for(var i = 0; i < this.gameObjects[gameObject].length; i++){
+             this.gameObjects[gameObject][i].draw(t);
+             }
+             }
+             }/*
+             for(var i = 0; i < this.gameObjects.length; i++) {
+             this.gameObjects[i].draw(t);
+             }*/
 
             gamvas.physics.drawDebug();
+        },
+        postDraw: function(t) {
+            // handle player death
+            if(!this.isDead) {
+                this.c.fillStyle = '#ff0000';
+                this.c.font = 'normal 70px consolas';
+                this.c.textAlign = 'center';
+
+                var pos = gamvas.getCanvasDimension();
+                this.c.fillText('YOU DIED', pos.w/2, pos.h/2);
+            }
         }
     });
 }
