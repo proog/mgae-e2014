@@ -44,16 +44,21 @@ playerActor = baseActor.extend({
         this.restitution = 0;
         this.canJump = false;
 
-        /*this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
                 this.object.size.width * Common.tileSize.width,
                 this.object.size.height * Common.tileSize.height,
-                gamvas.physics.DYNAMIC);*/
-
-        this.bodyCircle(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
-                this.object.size.width * Common.tileSize.width / 2,
-            gamvas.physics.DYNAMIC);
+                gamvas.physics.DYNAMIC);
 
         this.setFixedRotation(true);
+
+        var fixtureShape = new Box2D.Collision.Shapes.b2PolygonShape();
+        fixtureShape.SetAsOrientedBox(0.1, 0.1, new Box2D.Common.Math.b2Vec2(0,0.2), 0);
+        var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+        fixtureDef.shape = fixtureShape;
+        fixtureDef.density = 1;
+        fixtureDef.isSensor = true;
+
+        this.body.CreateFixture(fixtureDef);
     }
 });
 
