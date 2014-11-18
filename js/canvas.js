@@ -1,11 +1,6 @@
-function indexToPosition(row, col){
-    var dimensions = gamvas.getCanvasDimension();
-    var offsetx = dimensions.w / 2;
-    var offsety = dimensions.h / 2;
-
-    return {"x": Common.tileSize.width * col - offsetx, "y": Common.tileSize.height * row - offsety};
-}
-
-function indexToWorldPosition(row, col){
-    return {"x": Common.tileSize.width * col, "y": Common.tileSize.height * row};
+function getObjectWorldPosition(object) {
+    return {
+        x: object.position.col * Common.tileSize.width + object.size.width * Common.tileSize.width / 2,
+        y: object.position.row * Common.tileSize.height + object.size.height * Common.tileSize.height / 2
+    };
 }

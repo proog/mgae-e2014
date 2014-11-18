@@ -18,12 +18,12 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
+      cool  platforms  dood  ffffffff     ffffff    ff     ffffffff\
 \n\
 \n\
 \n\
-\n\
-   G        e             T\n\
-ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
+   G                   e             T\n\
+ffffffffff  yyy  fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\
 \n\

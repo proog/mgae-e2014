@@ -22,8 +22,14 @@ function Parser() {
         '!': 'danger',
         E: 'enemy'
     };
+    this.ignoredCharacters = [
+        ' ',
+        '\r',
+        '\n',
+        '\t'
+    ];
 
-    this.makeObject = function(symbol, col, row, role) {
+    this.makeObject = function(symbol, col, row, role, width, height) {
         return {
             symbol: symbol,
             role: role,
@@ -32,8 +38,8 @@ function Parser() {
                 row: row
             },
             size: {
-                width: 1,
-                height: 1
+                width: width,
+                height: height
             }
         };
     };
@@ -62,23 +68,49 @@ function Parser() {
             this.world.height = row;
 
             var line = lines[row];
+            var currentBlock = {
+                char: null,
+                role: null,
+                length: 0,
+                start: 0,
+                row: 0
+            };
 
             for(var col = 0; col < line.length; col++) {
                 var char = line[col].toString();
 
-                // ignore whitespace
-                if(char == ' ' || char == '\r')
-                    continue;
-
                 // fallback to default defs if not found in user-defined
                 var textRole = defs[char] ? defs[char].toLowerCase() : this.defaultDefinitions[char];
-
                 var role = this.textRoles[textRole] ? this.textRoles[textRole] : Common.roles.OBSTACLE;
-                var object = this.makeObject(char, col, row, role);
-                this.objects.push(object);
 
+                if(char == currentBlock.char) {
+                    // same symbol, extend current block
+                    currentBlock.length++;
+                }
+                else {
+                    // new symbol encountered, make the block, but only if it's not an ignored character
+                    if(currentBlock.length > 0 && this.ignoredCharacters.indexOf(currentBlock.char) < 0) {
+                        var object = this.makeObject(currentBlock.char, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
+                        this.objects.push(object);
+                    }
+
+                    // reset current block to this symbol
+                    currentBlock.char = char;
+                    currentBlock.role = role;
+                    currentBlock.length = 1;
+                    currentBlock.start = col;
+                    currentBlock.row = row;
+                }
+
+                // extend world width
                 if(col > this.world.width)
                     this.world.width = col;
+            }
+
+            // extra check for the last block on a line
+            if(currentBlock.length > 0 && this.ignoredCharacters.indexOf(currentBlock.char) < 0) {
+                var object = this.makeObject(currentBlock.char, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
+                this.objects.push(object);
             }
         }
 

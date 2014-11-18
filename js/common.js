@@ -12,6 +12,3 @@ Common.tileSize = {
     width: 30,
     height: 30
 };
-Common.playerVars = {
-    SPEED: 100
-}

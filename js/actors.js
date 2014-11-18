@@ -2,7 +2,7 @@ baseActor = gamvas.Actor.extend({
     create: function(name, object) {
         this.object = object;
 
-        var pos = indexToWorldPosition(object.position.row, object.position.col);
+        var pos = getObjectWorldPosition(object);
         this._super(name, pos.x, pos.y);
     }
 });
@@ -11,13 +11,12 @@ obstacleActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);
 
-        this.addState(new obstacleActorState('obstacle'));
-        this.setState('obstacle');
+        this.addState(new obstacleActorState('obstacle'), true);
 
         this.friction = 0;
         this.restitution = 0;
 
-        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+        this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.tileSize.width,
                 this.object.size.height * Common.tileSize.height,
                 gamvas.physics.STATIC);
@@ -30,35 +29,56 @@ enemyActor = baseActor.extend({
         this.addState(new enemyActorPatrollingState('patrolling'));
         this.addState(new enemyActorChasingState('chasing'));
         this.setState('patrolling');
+
+        this.friction = 0;
+        this.restitution = 0;
+        this.density = 10000; // this dude is really heavy
+
+        this.bodyCircle(this.position.x, this.position.y,
+                this.object.size.width * Common.tileSize.width / 2,
+            gamvas.physics.DYNAMIC);
+        this.setFixedRotation(true);
     }
-})
+});
+
+footActor = gamvas.Actor.extend({
+    create: function(name, x, y) {
+        this._super(name, x, y);
+        this.canJump = false;
+        this.restitution = 0;
+        this.friction = 0;
+        this.density = 0;
+        this.addState(new footActorState('footState'), true);
+        this.bodyRect(this.position.x, this.position.y, Common.tileSize.width/3, Common.tileSize.height/6, gamvas.physics.DYNAMIC);
+        this.setFixedRotation(true);
+        this.setSensor(true);
+    }
+});
 
 playerActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);
 
-        this.addState(new playerActorState('player'));
-        this.setState('player');
+        this.addState(new playerActorState('player'), true);
 
         this.friction = 0;
         this.restitution = 0;
         this.canJump = false;
 
-        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+        this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.tileSize.width,
                 this.object.size.height * Common.tileSize.height,
                 gamvas.physics.DYNAMIC);
-
         this.setFixedRotation(true);
 
-        var fixtureShape = new Box2D.Collision.Shapes.b2PolygonShape();
-        fixtureShape.SetAsOrientedBox(0.1, 0.1, new Box2D.Common.Math.b2Vec2(0,0.2), 0);
-        var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-        fixtureDef.shape = fixtureShape;
-        fixtureDef.density = 1;
-        fixtureDef.isSensor = true;
-
-        this.body.CreateFixture(fixtureDef);
+        this.foot = new footActor('foot', this.position.x, this.position.y);
+        var joint = new Box2D.Dynamics.Joints.b2RevoluteJointDef;
+        joint.bodyA = this.body;
+        joint.bodyB = this.foot.body;
+        joint.collideConnected = false;
+        joint.localAnchorA.Set(0, 0.25);
+        joint.localAnchorB.Set(0, 0);
+        gamvas.physics.getWorld().CreateJoint(joint);
     }
 });
 
@@ -66,13 +86,12 @@ dangerActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);
 
-        this.addState(new dangerActorState('danger'));
-        this.setState('danger');
+        this.addState(new dangerActorState('danger'), true);
 
         this.friction = 0;
         this.restitution = 0;
 
-        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+        this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.tileSize.width,
                 this.object.size.height * Common.tileSize.height,
             gamvas.physics.STATIC);
@@ -83,15 +102,21 @@ passiveActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);
 
-        this.addState(new baseActorState('passive'));
-        this.setState('passive');
+        this.addState(new baseActorState('passive'), true);
 
         this.friction = 0;
         this.restitution = 0;
 
-        this.bodyRect(this.position.x + Common.tileSize.width/2, this.position.y + Common.tileSize.height/2,
+        this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.tileSize.width,
                 this.object.size.height * Common.tileSize.height,
             gamvas.physics.STATIC);
+        this.setSensor(true);
+    }
+});
+
+goalActor = passiveActor.extend({
+    create: function(name, object) {
+        this._super(name, object);
     }
 });

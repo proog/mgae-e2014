@@ -1,7 +1,7 @@
 baseActorState = gamvas.ActorState.extend({
     init: function() {
         var state = gamvas.state.getCurrentState();
-        this.actor.setFile(state.resource.getImage('resources/tile.png'));
+        //this.actor.setFile(state.resource.getImage('resources/tile.png'));
     },
     draw: function(t) {
         this._super(t);
@@ -11,9 +11,24 @@ baseActorState = gamvas.ActorState.extend({
         a.c.font = 'normal 30px consolas';
         a.c.textAlign = 'center';
         a.c.textBaseline = 'middle';
-        a.c.fillText(this.actor.object.symbol,
-                this.actor.position.x,
+        var startPos = this.actor.position.x - Common.tileSize.width * this.actor.object.size.width / 2 + Common.tileSize.width/2;
+        for(var i = 0; i < this.actor.object.size.width; i++) {
+            a.c.fillText(this.actor.object.symbol,
+                startPos + Common.tileSize.width * i,
                 this.actor.position.y);
+        }
+    }
+});
+
+passiveActorState = baseActorState.extend({
+    init: function() {
+        this._super();
+    },
+    update: function(t) {
+
+    },
+    draw: function(t) {
+        this._super(t);
     }
 });
 
@@ -55,7 +70,7 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         this._super();
     },
     update: function(t){
-        if(Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistance * Common.tileSize.width){
+        if(!this.target.isDead && Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistance * Common.tileSize.width){
             console.log("You lookin' at me?!");
             this.actor.setState("chasing");
             return;
@@ -114,6 +129,39 @@ dangerActorState = baseActorState.extend({
     }
 });
 
+footActorState = gamvas.ActorState.extend({
+    onCollisionEnter: function(other) {
+        if(other.object.role == Common.roles.OBSTACLE)
+            this.actor.canJump = true;
+    },
+    onCollisionLeave: function(other) {
+        if(other.object.role == Common.roles.OBSTACLE)
+            this.actor.canJump = false;
+    },
+    doCollide: function(other) {
+        return true;
+    },
+    update: function(t){
+        var velocity = this.actor.body.GetLinearVelocity();
+        var jumpImpulse = 0;
+        var desiredVelocity = 0;
+
+        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump)
+            jumpImpulse = this.actor.body.GetMass() * (-8 - velocity.y);
+        if(gamvas.key.isPressed(gamvas.key.LEFT))
+            desiredVelocity = -5;
+        else if(gamvas.key.isPressed(gamvas.key.RIGHT))
+            desiredVelocity = 5;
+        else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT))
+            desiredVelocity = 0;
+
+        var change = desiredVelocity - velocity.x;
+        var impulse = this.actor.body.GetMass() * change;
+        this.actor.setAwake(true);
+        this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, jumpImpulse), this.actor.body.GetWorldCenter());
+    }
+});
+
 playerActorState = baseActorState.extend({
     init: function() {
         this._super();
@@ -128,31 +176,12 @@ playerActorState = baseActorState.extend({
         this.camera = gamvas.state.getCurrentState().camera;
     },
     update: function(t) {
-        // listen for input and move actor
-        var currentVelocity = this.actor.body.GetLinearVelocity();
-        var newImpulseY = 0;
-        var newVelocityX = 0;
+        // update foot state
+        this.actor.foot.getCurrentState().update(t);
 
-        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump) {
-            newImpulseY = -0.8;
-        }
-
-        if(gamvas.key.isPressed(gamvas.key.LEFT)) {
-            this.actor.setAwake(true);
-            newVelocityX = -5;
-        }
-        if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
-            this.actor.setAwake(true);
-            newVelocityX = 5;
-        }
-
-        if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT)) {
-            newVelocityX = 0;
-        }
-
-        var velocityChange = newVelocityX - currentVelocity.x;
-        var newImpulseX = this.actor.body.GetMass() * velocityChange;
-        this.actor.body.ApplyImpulse(new gamvas.Vector2D(newImpulseX, newImpulseY), this.actor.body.GetWorldCenter());
+        // check for out of bounds
+        if(this.actor.position.y > this.worldDimensions.height)
+            this.actor.isDead = true;
 
         //Camera movement
         var cameraPositionX = Math.max(Math.min(this.actor.position.x, this.cameraBounds.right), this.cameraBounds.left);
@@ -166,12 +195,17 @@ playerActorState = baseActorState.extend({
         return true;
     },
     onCollisionEnter: function(other) {
-        if(other.object.role == Common.roles.OBSTACLE)
-            this.actor.canJump = true;
-        else if(other.object.role == Common.roles.DANGER || other.object.role == Common.roles.ENEMY)
-            this.actor.isDead = true;
+        switch(other.object.role) {
+            case Common.roles.DANGER:
+            case Common.roles.ENEMY:
+                this.actor.isDead = true;
+                break;
+            case Common.roles.GOAL:
+                this.actor.hasWon = true;
+                break;
+        }
     },
     onCollisionLeave: function(other) {
-        this.actor.canJump = false;
+
     }
 });
