@@ -1,6 +1,9 @@
 function createWorld(world, objects) {
     return gamvas.State.extend({
         init: function() {
+            // clean up leftover physics objects when restarting
+            gamvas.physics.resetWorld();
+
             this.worldDimensions = {
                 width: world.width * Common.tileSize.width,
                 height: world.height * Common.tileSize.height
@@ -44,13 +47,15 @@ function createWorld(world, objects) {
 
             gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
 
-            this.music = this.addSound('resources/bgm.mp3');
-            this.playing = false;
+            // if this is not a restarted level, load music
+            if(!this.music)
+                this.music = this.addSound('resources/bgm.mp3');
         },
         update: function(t) {
-            if(this.music.isReady() && !this.playing) {
+            // play music
+            if(!this.musicPlaying && this.music.isReady()) {
                 this.music.loop();
-                this.playing = true;
+                this.musicPlaying = true;
             }
         },
         draw: function(t) {
@@ -70,7 +75,7 @@ function createWorld(world, objects) {
                  }
              }
 
-            //gamvas.physics.drawDebug();
+            gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
             this.c.font = 'normal 70px consolas';
@@ -81,17 +86,24 @@ function createWorld(world, objects) {
             if(this.gameObjects.player.isDead) {
                 this.c.fillStyle = '#ff0000';
                 this.c.fillText('YOU DIED', pos.w/2, pos.h/2);
+                this.c.font = 'normal 30px consolas';
+                this.c.fillText('Space to try again', pos.w/2, pos.h/2 + 70);
             }
 
-            // handle player death
+            // handle player win
             if(this.gameObjects.player.hasWon) {
                 this.c.fillStyle = '#00ff00';
                 this.c.fillText('YOU WON', pos.w/2, pos.h/2);
             }
         },
         onKeyDown: function(key) {
-            if(key == gamvas.key.ESCAPE)
+            if(key == gamvas.key.ESCAPE && !this.gameObjects.player.isDead)
                 gamvas.state.setState('pause');
+
+            if(key == gamvas.key.SPACE && this.gameObjects.player.isDead) {
+                console.log('resetting world');
+                this.init();
+            }
         },
         enter: function() {
             this.music.resume();

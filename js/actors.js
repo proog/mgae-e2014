@@ -44,14 +44,15 @@ enemyActor = baseActor.extend({
 });
 
 footActor = gamvas.Actor.extend({
-    create: function(name, x, y) {
+    create: function(name, x, y, playerActor) {
         this._super(name, x, y);
         this.canJump = false;
+        this.player = playerActor;
         this.restitution = 0;
         this.friction = 0;
         this.density = 0;
         this.addState(new footActorState('footState'), true);
-        this.bodyRect(this.position.x, this.position.y, Common.tileSize.width/1.2, Common.tileSize.height/4, gamvas.physics.DYNAMIC);
+        this.bodyRect(this.position.x, this.position.y, Common.tileSize.width/2, Common.tileSize.height/3, gamvas.physics.DYNAMIC);
         this.setFixedRotation(true);
         this.setSensor(true);
     }
@@ -67,13 +68,12 @@ playerActor = baseActor.extend({
         this.restitution = 0;
         this.canJump = false;
 
-        this.bodyRect(this.position.x, this.position.y,
-                this.object.size.width * Common.tileSize.width,
-                this.object.size.height * Common.tileSize.height,
+        this.bodyCircle(this.position.x, this.position.y,
+                this.object.size.width * Common.tileSize.width / 2,
                 gamvas.physics.DYNAMIC);
         this.setFixedRotation(true);
 
-        this.foot = new footActor('foot', this.position.x, this.position.y);
+        this.foot = new footActor('foot', this.position.x, this.position.y, this);
         var joint = new Box2D.Dynamics.Joints.b2RevoluteJointDef;
         joint.bodyA = this.body;
         joint.bodyB = this.foot.body;

@@ -157,6 +157,10 @@ footActorState = gamvas.ActorState.extend({
         return true;
     },
     update: function(t){
+        // don't process input if player is dead
+        if(this.actor.player.isDead)
+            return;
+
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
         var desiredVelocity = 0;
@@ -165,11 +169,11 @@ footActorState = gamvas.ActorState.extend({
             jumpImpulse = this.actor.body.GetMass() * (-8 - velocity.y);
         if(gamvas.key.isPressed(gamvas.key.LEFT)) {
             desiredVelocity = -5;
-            this.actor.direction = Common.directions.LEFT;
+            this.actor.player.direction = Common.directions.LEFT;
         }
         else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
             desiredVelocity = 5;
-            this.actor.direction = Common.directions.RIGHT;
+            this.actor.player.direction = Common.directions.RIGHT;
         }
         else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT))
             desiredVelocity = 0;
@@ -197,7 +201,6 @@ playerActorState = baseActorState.extend({
     update: function(t) {
         // update foot state
         this.actor.foot.getCurrentState().update(t);
-        this.actor.direction = this.actor.foot.direction;
 
         // check for out of bounds
         if(this.actor.position.y > this.worldDimensions.height)
