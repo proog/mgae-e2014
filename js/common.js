@@ -12,3 +12,7 @@ Common.tileSize = {
     width: 30,
     height: 30
 };
+Common.directions = {
+    LEFT: -1,
+    RIGHT: 1
+};

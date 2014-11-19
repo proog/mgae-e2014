@@ -43,11 +43,20 @@ function createWorld(world, objects) {
             }
 
             gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
+
+            this.music = this.addSound('resources/bgm.mp3');
+            this.playing = false;
+        },
+        update: function(t) {
+            if(this.music.isReady() && !this.playing) {
+                this.music.loop();
+                this.playing = true;
+            }
         },
         draw: function(t) {
             var dimensions = gamvas.getCanvasDimension();
             var pos = this.camera.position;
-            this.c.fillStyle = 'pink';
+            this.c.fillStyle = 'white';
             this.c.fillRect(pos.x - dimensions.w/2, pos.y - dimensions.h/2, dimensions.w, dimensions.h);
 
              for(var key in this.gameObjects) {
@@ -61,7 +70,7 @@ function createWorld(world, objects) {
                  }
              }
 
-            gamvas.physics.drawDebug();
+            //gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
             this.c.font = 'normal 70px consolas';
@@ -79,6 +88,38 @@ function createWorld(world, objects) {
                 this.c.fillStyle = '#00ff00';
                 this.c.fillText('YOU WON', pos.w/2, pos.h/2);
             }
+        },
+        onKeyDown: function(key) {
+            if(key == gamvas.key.ESCAPE)
+                gamvas.state.setState('pause');
+        },
+        enter: function() {
+            this.music.resume();
+        },
+        leave: function() {
+            this.music.stop();
         }
     });
 }
+
+pauseState = gamvas.State.extend({
+    init: function() {
+
+    },
+    update: function(t) {
+
+    },
+    draw: function(t) {
+        this.c.font = 'normal 70px consolas';
+        this.c.textAlign = 'center';
+        this.c.fillStyle = '#fff';
+        this.c.fillText('PAUSED', 0, 0);
+
+        this.c.font = 'normal 30px consolas';
+        this.c.fillText('Esc to resume', 0, 70);
+    },
+    onKeyDown: function(key) {
+        if(key == gamvas.key.ESCAPE)
+            gamvas.state.setState('game');
+    }
+});

@@ -1,6 +1,8 @@
 baseActor = gamvas.Actor.extend({
     create: function(name, object) {
         this.object = object;
+        this.direction = Common.directions.RIGHT;
+        this.fontSize = Common.tileSize.height;
 
         var pos = getObjectWorldPosition(object);
         this._super(name, pos.x, pos.y);
@@ -49,7 +51,7 @@ footActor = gamvas.Actor.extend({
         this.friction = 0;
         this.density = 0;
         this.addState(new footActorState('footState'), true);
-        this.bodyRect(this.position.x, this.position.y, Common.tileSize.width/3, Common.tileSize.height/6, gamvas.physics.DYNAMIC);
+        this.bodyRect(this.position.x, this.position.y, Common.tileSize.width/1.2, Common.tileSize.height/4, gamvas.physics.DYNAMIC);
         this.setFixedRotation(true);
         this.setSensor(true);
     }

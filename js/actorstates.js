@@ -1,22 +1,38 @@
 baseActorState = gamvas.ActorState.extend({
     init: function() {
-        var state = gamvas.state.getCurrentState();
+        //var state = gamvas.state.getCurrentState();
         //this.actor.setFile(state.resource.getImage('resources/tile.png'));
     },
     draw: function(t) {
         this._super(t);
 
+        var startPos = this.actor.position.x - Common.tileSize.width * this.actor.object.size.width / 2 + Common.tileSize.width/2;
         var a = this.actor.getCurrentAnimation();
+
+        a.c.save();
+
+        // mirror text if direction is left
+        if(this.actor.direction == Common.directions.LEFT) {
+            startPos = this.actor.position.x + Common.tileSize.width * this.actor.object.size.width / 2 - Common.tileSize.width/2;
+            a.c.translate(startPos, this.actor.position.y);
+            a.c.scale(-1,1);
+            a.c.translate(-startPos, -this.actor.position.y);
+        }
+
+        // set up style
         a.c.fillStyle = '#000';
-        a.c.font = 'normal 30px consolas';
+        a.c.font = 'normal ' + this.actor.fontSize + 'px consolas';
         a.c.textAlign = 'center';
         a.c.textBaseline = 'middle';
-        var startPos = this.actor.position.x - Common.tileSize.width * this.actor.object.size.width / 2 + Common.tileSize.width/2;
+
+        // draw all symbols for this actor
         for(var i = 0; i < this.actor.object.size.width; i++) {
-            a.c.fillText(this.actor.object.symbol,
+            a.c.fillText(this.actor.object.symbol[i],
                 startPos + Common.tileSize.width * i,
                 this.actor.position.y);
         }
+
+        a.c.restore();
     }
 });
 
@@ -76,16 +92,15 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
             return;
         }
         if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
-            this.directionX = -this.directionX;
+            if(this.actor.direction == Common.directions.RIGHT)
+                this.actor.direction = Common.directions.LEFT;
+            else
+                this.actor.direction = Common.directions.RIGHT;
+
             console.log("switching enemy direction");
         }
-        //this.timeSpent += t;
-        this.velocity = this.speed * this.directionX * t;
-        /*if(this.timeSpent > this.timeThreshold){
-            console.log("switching enemy direction");
-            this.directionX = this.directionX > 0 ? -1 : 1;
-            this.timeSpent = 0;
-        }*/
+
+        this.velocity = this.speed * (this.actor.direction == Common.directions.RIGHT ? 1 : -1) * t;
         this.actor.move(this.velocity, 0);
     },
     draw: function(t){
@@ -104,12 +119,12 @@ enemyActorChasingState = baseEnemyActorState.extend({
             this.actor.getCurrentState().basePatrollingPositionX = this.actor.position.x;
             return;
         }
-        if(this.target.position.x < this.actor.position.x){
-            this.direction = -1;
-        } else {
-            this.direction = 1;
-        }
-        this.velocity = this.speed * this.direction * t;
+        if(this.target.position.x < this.actor.position.x)
+            this.actor.direction = Common.directions.LEFT;
+        else
+            this.actor.direction = Common.directions.RIGHT;
+
+        this.velocity = this.speed * (this.actor.direction == Common.directions.RIGHT ? 1 : -1) * t;
         this.actor.move(this.velocity, 0);
     },
     draw: function(t){
@@ -148,10 +163,14 @@ footActorState = gamvas.ActorState.extend({
 
         if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump)
             jumpImpulse = this.actor.body.GetMass() * (-8 - velocity.y);
-        if(gamvas.key.isPressed(gamvas.key.LEFT))
+        if(gamvas.key.isPressed(gamvas.key.LEFT)) {
             desiredVelocity = -5;
-        else if(gamvas.key.isPressed(gamvas.key.RIGHT))
+            this.actor.direction = Common.directions.LEFT;
+        }
+        else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
             desiredVelocity = 5;
+            this.actor.direction = Common.directions.RIGHT;
+        }
         else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT))
             desiredVelocity = 0;
 
@@ -178,6 +197,7 @@ playerActorState = baseActorState.extend({
     update: function(t) {
         // update foot state
         this.actor.foot.getCurrentState().update(t);
+        this.actor.direction = this.actor.foot.direction;
 
         // check for out of bounds
         if(this.actor.position.y > this.worldDimensions.height)

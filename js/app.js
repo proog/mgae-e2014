@@ -14,15 +14,13 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
+                                                     T\n\
+      cool  platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
 \n\
 \n\
 \n\
 \n\
-      cool  platforms  dood  ffffffff     ffffff    ff     ffffffff\
-\n\
-\n\
-\n\
-   G                   e             T\n\
+   G                   e             \n\
 ffffffffff  yyy  fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\
@@ -33,13 +31,16 @@ ffffffffff  yyy  fffffffffffffffffffffffffffffffffffffffff\n\
 \n';
 
     var parser = new Parser();
+    parser.blockMode = true;
     parser.parse(testlevel);
     console.log(parser.objects);
     console.log(parser.world);
 
     var mainState = createWorld(parser.world, parser.objects);
-    gamvas.state.addState(new mainState('mainGame'));
+    gamvas.state.addState(new mainState('game'));
+    gamvas.state.addState(new pauseState('pause'));
     gamvas.start('gameCanvas', true);
+    gamvas.state.setState('game');
 });
 
 gamvas.config.preventKeyEvents = true;
