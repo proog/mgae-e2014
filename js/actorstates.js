@@ -82,14 +82,14 @@ baseEnemyActorState = baseActorState.extend({
     draw: function(t){
         this._super(t);
     },
-    onCollisionEnter: (function(other){
+    onCollisionEnter: function(other){
         if(other.object.role == Common.roles.OBSTACLE)
             this.actor.canJump = true;
-    }),
-    onCollisionLeave: (function(other) {
+    },
+    onCollisionLeave: function(other) {
         if(other.object.role == Common.roles.OBSTACLE)
             this.actor.canJump = false;
-    })
+    }
 });
 
 enemyActorPatrollingState = baseEnemyActorState.extend({
@@ -157,8 +157,10 @@ enemyActorChasingState = baseEnemyActorState.extend({
 
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
-        if(this.actor.canJump)
+        if(this.actor.canJump) {
             jumpImpulse = this.actor.body.GetMass() * (-3 - velocity.y);
+            gamvas.state.getCurrentState().jumpSound.play();
+        }
         var desiredVelocity = this.chasingSpeed * this.actor.direction;
 
         var change = desiredVelocity - velocity.x;
@@ -191,9 +193,7 @@ footActorState = gamvas.ActorState.extend({
         }
     },
     onCollisionLeave: function(other) {
-        if(other.object.role == Common.roles.OBSTACLE) {
-            this.actor.canJump = this.actor.jumps > 0;
-        }
+
     },
     doCollide: function(other) {
         return true;
@@ -207,11 +207,13 @@ footActorState = gamvas.ActorState.extend({
         var jumpImpulse = 0;
         var desiredVelocity = 0;
 
-        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump && this.actor.jumps > 0 && !this.jumping) {
+        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump && !this.jumping) {
             jumpImpulse = this.actor.body.GetMass() * (-5 - velocity.y);
             this.actor.jumps--;
             this.actor.canJump = this.actor.jumps > 0;
             this.jumping = true;
+
+            gamvas.state.getCurrentState().jumpSound.play();
         }
 
         if(gamvas.key.isPressed(gamvas.key.LEFT)) {

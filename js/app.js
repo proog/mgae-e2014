@@ -14,7 +14,7 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-                                                    T\n\
+               M                                    T\n\
       cool platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
 \n\
 cc\n\

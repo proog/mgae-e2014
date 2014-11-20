@@ -54,6 +54,9 @@ footActor = gamvas.Actor.extend({
         this.restitution = 0;
         this.friction = 0;
         this.density = 0;
+        this.object = {
+            role: Common.roles.PASSIVE
+        };
         this.addState(new footActorState('footState'), true);
         this.bodyRect(this.position.x, this.position.y, Common.reducedTileSize.width/2, Common.reducedTileSize.height/3, gamvas.physics.DYNAMIC);
         this.setFixedRotation(true);

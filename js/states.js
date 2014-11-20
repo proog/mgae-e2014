@@ -58,6 +58,7 @@ function createWorld(levels) {
             // if this is not a restarted level, load music
             if(!this.music)
                 this.music = this.addSound('resources/bgm.mp3');
+            this.jumpSound = this.addSound('resources/jump.mp3');
         },
         update: function(t) {
             // play music
