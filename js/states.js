@@ -54,7 +54,7 @@ function createWorld(world, objects) {
         update: function(t) {
             // play music
             if(!this.musicPlaying && this.music.isReady()) {
-                this.music.loop();
+                //this.music.loop();
                 this.musicPlaying = true;
             }
         },
@@ -106,7 +106,7 @@ function createWorld(world, objects) {
             }
         },
         enter: function() {
-            this.music.resume();
+            //this.music.resume();
         },
         leave: function() {
             this.music.stop();

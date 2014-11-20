@@ -69,16 +69,28 @@ baseEnemyActorState = baseActorState.extend({
         this.timeSpent = 0;
         this.speed = 40;
         this.velocity = 0;
-        this.chaseDistance = 4; //number of tiles
+        this.chaseDistanceX = 4; //number of tiles
+        this.chaseDistanceY = 2;
         this.basePatrollingPositionX = this.actor.position.x;
         this.target = gamvas.state.getCurrentState().gameObjects.player;
+        this.canJump = true;
+        this.patrollingSpeed = 1.5;
+        this.chasingSpeed = 3;
     },
     update: function(t){
 
     },
     draw: function(t){
         this._super(t);
-    }
+    },
+    onCollisionEnter: (function(other){
+        if(other.object.role == Common.roles.OBSTACLE)
+            this.actor.canJump = true;
+    }),
+    onCollisionLeave: (function(other) {
+        if(other.object.role == Common.roles.OBSTACLE)
+            this.actor.canJump = false;
+    })
 });
 
 enemyActorPatrollingState = baseEnemyActorState.extend({
@@ -86,22 +98,34 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         this._super();
     },
     update: function(t){
-        if(!this.target.isDead && Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistance * Common.tileSize.width){
+        if(!this.target.isDead && Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistanceX * Common.tileSize.width
+            && Math.abs(this.target.position.y - this.actor.position.y) < this.chaseDistanceY * Common.tileSize.height){
             console.log("You lookin' at me?!");
             this.actor.setState("chasing");
             return;
         }
         if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
-            if(this.actor.direction == Common.directions.RIGHT)
-                this.actor.direction = Common.directions.LEFT;
-            else
+            if(this.actor.position.x < this.basePatrollingPositionX){
                 this.actor.direction = Common.directions.RIGHT;
-
-            console.log("switching enemy direction");
+                console.log("Enemy direction: RIGHT");
+            } else {
+                this.actor.direction = Common.directions.LEFT;
+                console.log("Enemy direction: LEFT");
+            }
         }
 
-        this.velocity = this.speed * (this.actor.direction == Common.directions.RIGHT ? 1 : -1) * t;
-        this.actor.move(this.velocity, 0);
+        //this.actor.body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2_zero);
+        var velocity = this.actor.body.GetLinearVelocity();
+        var desiredVelocity = this.patrollingSpeed * this.actor.direction;
+
+        var change = desiredVelocity - velocity.x;
+        var impulse = this.actor.body.GetMass() * change;
+        this.actor.setAwake(true);
+        this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, 0), this.actor.body.GetWorldCenter());
+
+
+        //this.velocity = this.speed * this.actor.direction * t;
+        //this.actor.move(this.velocity, 0);
     },
     draw: function(t){
         this._super(t);
@@ -113,19 +137,34 @@ enemyActorChasingState = baseEnemyActorState.extend({
         this._super();
     },
     update: function(t){
-        if(Math.abs(this.target.position.x - this.actor.position.x) > this.chaseDistance * Common.tileSize.width) {
+        if(Math.abs(this.target.position.x - this.actor.position.x) > this.chaseDistanceX * Common.tileSize.width
+            || Math.abs(this.target.position.y - this.actor.position.y) > this.chaseDistanceY * Common.tileSize.height) {
             console.log("Hmpf, I'll let you go this time");
             this.actor.setState("patrolling");
             this.actor.getCurrentState().basePatrollingPositionX = this.actor.position.x;
             return;
         }
-        if(this.target.position.x < this.actor.position.x)
+        if(this.target.position.x + Common.tileSize.width / 2 < this.actor.position.x)
             this.actor.direction = Common.directions.LEFT;
-        else
+        else if(this.target.position.x - Common.tileSize.width / 2 > this.actor.position.x)
             this.actor.direction = Common.directions.RIGHT;
+        else
+            this.actor.direction = Common.directions.NONE;
 
-        this.velocity = this.speed * (this.actor.direction == Common.directions.RIGHT ? 1 : -1) * t;
-        this.actor.move(this.velocity, 0);
+        var velocity = this.actor.body.GetLinearVelocity();
+        var jumpImpulse = 0;
+        if(this.actor.canJump)
+            jumpImpulse = this.actor.body.GetMass() * (-3 - velocity.y);
+        var desiredVelocity = this.chasingSpeed * this.actor.direction;
+
+        var change = desiredVelocity - velocity.x;
+        var impulse = this.actor.body.GetMass() * change;
+        this.actor.setAwake(true);
+        this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, jumpImpulse), this.actor.body.GetWorldCenter());
+
+        //this.velocity = this.speed * this.actor.direction * t;
+        //this.actor.move(this.velocity, 0);
+
     },
     draw: function(t){
         this._super(t);

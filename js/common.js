@@ -14,5 +14,6 @@ Common.tileSize = {
 };
 Common.directions = {
     LEFT: -1,
-    RIGHT: 1
+    RIGHT: 1,
+    NONE: 0
 };
