@@ -1,9 +1,17 @@
-function createWorld(world, objects) {
-    return gamvas.State.extend({
+function createWorld(levels) {
+    var mainState = gamvas.State.extend({
         init: function() {
             // clean up leftover physics objects when restarting
             gamvas.physics.resetWorld();
 
+            this.levels = levels;
+
+            // for the first level
+            if(typeof this.levelIndex == 'undefined')
+                this.levelIndex = 0;
+
+            var objects = this.levels[this.levelIndex].objects;
+            var world = this.levels[this.levelIndex].world;
             this.worldDimensions = {
                 width: world.width * Common.tileSize.width,
                 height: world.height * Common.tileSize.height
@@ -54,7 +62,7 @@ function createWorld(world, objects) {
         update: function(t) {
             // play music
             if(!this.musicPlaying && this.music.isReady()) {
-                this.music.loop();
+                //this.music.loop();
                 this.musicPlaying = true;
             }
         },
@@ -92,8 +100,9 @@ function createWorld(world, objects) {
 
             // handle player win
             if(this.gameObjects.player.hasWon) {
-                this.c.fillStyle = '#00ff00';
-                this.c.fillText('YOU WON', pos.w/2, pos.h/2);
+                //this.c.fillStyle = '#00ff00';
+                //this.c.fillText('YOU WON', pos.w/2, pos.h/2);
+                this.nextLevel();
             }
         },
         onKeyDown: function(key) {
@@ -106,12 +115,23 @@ function createWorld(world, objects) {
             }
         },
         enter: function() {
-            this.music.resume();
+            //this.music.resume();
         },
         leave: function() {
             this.music.stop();
+        },
+        nextLevel: function() {
+            if(this.levelIndex + 1 < this.levels.length) {
+                this.levelIndex++;
+                this.init();
+            }
+            else {
+                // game finished?
+            }
         }
     });
+
+    return mainState;
 }
 
 pauseState = gamvas.State.extend({

@@ -9,10 +9,14 @@ Common.roles = {
     COLLECTIBLE: 7
 };
 Common.tileSize = {
-    width: 30,
+    width: 22,
     height: 30
 };
 Common.directions = {
     LEFT: -1,
     RIGHT: 1
+};
+Common.reducedTileSize = {
+    width: Common.tileSize.width - 5,
+    height: Common.tileSize.height - 1
 };

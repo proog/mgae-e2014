@@ -1,9 +1,9 @@
 gamvas.event.addOnLoad(function() {
     var testlevel = '{\
-"M": "player",\n\
+"=": "player",\n\
 "f": "obstacle",\n\
-"!": "danger",\n\
-"e": "enemy"\n\
+"y": "danger",\n\
+"M": "enemy"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
@@ -14,14 +14,39 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-                                                     T\n\
-      cool  platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
+                                                    T\n\
+      cool platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
+\n\
+cc\n\
+\n\
+   cc\n\
+   =                   M             \n\
+ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
+\n\
+\n\
+\n\
+BEGINLEVEL\n\
 \n\
 \n\
 \n\
 \n\
-   M                   e             \n\
-ffffffffff  !!!  fffffffffffffffffffffffffffffffffffffffff\n\
+\n\
+\n\
+\n\
+\n\
+  =\n\
+\n\
+\n\
+\n\
+                M          T\n\
+             fffffff    goal!\n\
+\n\
+   \n\
+ffffff  hi! jkljkffffffffffffffffffffljkl\n\
+\n\
+\n\
+\n\
+\n\
 \n\
 \n\
 \n\
@@ -33,10 +58,9 @@ ffffffffff  !!!  fffffffffffffffffffffffffffffffffffffffff\n\
     var parser = new Parser();
     parser.blockMode = true;
     parser.parse(testlevel);
-    console.log(parser.objects);
-    console.log(parser.world);
+    console.log(parser.levels);
 
-    var mainState = createWorld(parser.world, parser.objects);
+    var mainState = createWorld(parser.levels);
     gamvas.state.addState(new mainState('game'));
     gamvas.state.addState(new pauseState('pause'));
     gamvas.start('gameCanvas', true);
@@ -52,10 +76,9 @@ function fileSelected(event) {
     reader.onload = function() {
         var parser = new Parser();
         parser.parse(reader.result);
-        console.log(parser.objects);
-        console.log(parser.world);
+        console.log(parser.levels);
 
-        var mainState = createWorld(parser.world, parser.objects);
+        var mainState = createWorld(parser.levels);
         gamvas.state.addState(new mainState('mainGame'));
         gamvas.start('gameCanvas', true);
     };

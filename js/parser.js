@@ -1,9 +1,5 @@
 function Parser() {
-    this.objects = [];
-    this.world = {
-        width: 0,
-        height: 0
-    };
+    this.levels = [];
     this.definitions = [];
     this.separator = '\nBEGINLEVEL';
     this.textRoles = {
@@ -57,12 +53,14 @@ function Parser() {
     this.parse = function (str) {
         var split = str.split(this.separator);
 
-        if(split.length != 2) {
+        if(split.length < 2) {
             return;
         }
 
         this.parseDefinitions(split[0]);
-        this.parseLevel(split[1], this.definitions);
+
+        for(var i = 1; i < split.length; i++)
+            this.parseLevel(split[i], this.definitions);
     };
 
     this.parseDefinitions = function (str) {
@@ -72,10 +70,14 @@ function Parser() {
 
     this.parseLevel = function (str, defs) {
         var lines = str.split('\n');
-        this.objects = [];
+        var objects = [];
+        var world = {
+            width: 0,
+            height: 0
+        };
 
         for(var row = 0; row < lines.length; row++) {
-            this.world.height = row;
+            world.height = row;
 
             var line = lines[row];
             var currentBlock = {
@@ -90,8 +92,8 @@ function Parser() {
                 var char = line[col].toString();
 
                 // extend world width
-                if(col > this.world.width)
-                    this.world.width = col;
+                if(col > world.width)
+                    world.width = col;
 
                 // fallback to default defs if not found in user-defined
                 var textRole = defs[char] ? defs[char].toLowerCase() : this.defaultDefinitions[char];
@@ -112,7 +114,7 @@ function Parser() {
                         // new role encountered, make the current block, but only if not containing ignored characters
                         if(currentBlock.length > 0 && !this.containsIgnoredCharacters(currentBlock.string)) {
                             var object = this.makeObject(currentBlock.string, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
-                            this.objects.push(object);
+                            objects.push(object);
                         }
 
                         // initialize current block to this symbol
@@ -127,7 +129,7 @@ function Parser() {
                     // old mode with equal sized blocks
                     if(!this.containsIgnoredCharacters(char)) {
                         var object = this.makeObject(char, col, row, role, 1, 1);
-                        this.objects.push(object);
+                        objects.push(object);
                     }
                 }
             }
@@ -135,10 +137,13 @@ function Parser() {
             // extra check for the last block on a line
             if(this.blockMode && currentBlock.length > 0 && !this.containsIgnoredCharacters(currentBlock.string)) {
                 var object = this.makeObject(currentBlock.string, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
-                this.objects.push(object);
+                objects.push(object);
             }
         }
 
-        return this.objects;
+        this.levels.push({
+            world: world,
+            objects: objects
+        });
     };
 }
