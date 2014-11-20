@@ -72,13 +72,12 @@ baseEnemyActorState = baseActorState.extend({
         this.chaseDistanceX = 4; //number of tiles
         this.chaseDistanceY = 2;
         this.basePatrollingPositionX = this.actor.position.x;
-        this.target = gamvas.state.getCurrentState().gameObjects.player;
         this.canJump = true;
         this.patrollingSpeed = 1.5;
         this.chasingSpeed = 3;
     },
     update: function(t){
-
+        this.target = gamvas.state.getCurrentState().gameObjects.player;
     },
     draw: function(t){
         this._super(t);
@@ -98,6 +97,11 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         this._super();
     },
     update: function(t){
+        this._super(t);
+
+        if(!this.target)
+            return;
+
         if(!this.target.isDead && Math.abs(this.target.position.x - this.actor.position.x) < this.chaseDistanceX * Common.tileSize.width
             && Math.abs(this.target.position.y - this.actor.position.y) < this.chaseDistanceY * Common.tileSize.height){
             console.log("You lookin' at me?!");
@@ -114,7 +118,6 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
             }
         }
 
-        //this.actor.body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2_zero);
         var velocity = this.actor.body.GetLinearVelocity();
         var desiredVelocity = this.patrollingSpeed * this.actor.direction;
 
@@ -122,10 +125,6 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         var impulse = this.actor.body.GetMass() * change;
         this.actor.setAwake(true);
         this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, 0), this.actor.body.GetWorldCenter());
-
-
-        //this.velocity = this.speed * this.actor.direction * t;
-        //this.actor.move(this.velocity, 0);
     },
     draw: function(t){
         this._super(t);
@@ -137,6 +136,11 @@ enemyActorChasingState = baseEnemyActorState.extend({
         this._super();
     },
     update: function(t){
+        this._super(t);
+
+        if(!this.target)
+            return;
+
         if(Math.abs(this.target.position.x - this.actor.position.x) > this.chaseDistanceX * Common.tileSize.width
             || Math.abs(this.target.position.y - this.actor.position.y) > this.chaseDistanceY * Common.tileSize.height) {
             console.log("Hmpf, I'll let you go this time");
@@ -161,10 +165,6 @@ enemyActorChasingState = baseEnemyActorState.extend({
         var impulse = this.actor.body.GetMass() * change;
         this.actor.setAwake(true);
         this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, jumpImpulse), this.actor.body.GetWorldCenter());
-
-        //this.velocity = this.speed * this.actor.direction * t;
-        //this.actor.move(this.velocity, 0);
-
     },
     draw: function(t){
         this._super(t);
@@ -185,12 +185,15 @@ dangerActorState = baseActorState.extend({
 
 footActorState = gamvas.ActorState.extend({
     onCollisionEnter: function(other) {
-        if(other.object.role == Common.roles.OBSTACLE)
+        if(other.object.role == Common.roles.OBSTACLE) {
+            this.actor.jumps = this.actor.maxJumps;
             this.actor.canJump = true;
+        }
     },
     onCollisionLeave: function(other) {
-        if(other.object.role == Common.roles.OBSTACLE)
-            this.actor.canJump = false;
+        if(other.object.role == Common.roles.OBSTACLE) {
+            this.actor.canJump = this.actor.jumps > 0;
+        }
     },
     doCollide: function(other) {
         return true;
@@ -204,8 +207,13 @@ footActorState = gamvas.ActorState.extend({
         var jumpImpulse = 0;
         var desiredVelocity = 0;
 
-        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump)
-            jumpImpulse = this.actor.body.GetMass() * (-8 - velocity.y);
+        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump && this.actor.jumps > 0 && !this.jumping) {
+            jumpImpulse = this.actor.body.GetMass() * (-5 - velocity.y);
+            this.actor.jumps--;
+            this.actor.canJump = this.actor.jumps > 0;
+            this.jumping = true;
+        }
+
         if(gamvas.key.isPressed(gamvas.key.LEFT)) {
             desiredVelocity = -5;
             this.actor.player.direction = Common.directions.LEFT;
@@ -214,13 +222,15 @@ footActorState = gamvas.ActorState.extend({
             desiredVelocity = 5;
             this.actor.player.direction = Common.directions.RIGHT;
         }
-        else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT))
+        else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT)) {
             desiredVelocity = 0;
+        }
 
         var change = desiredVelocity - velocity.x;
         var impulse = this.actor.body.GetMass() * change;
         this.actor.setAwake(true);
         this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, jumpImpulse), this.actor.body.GetWorldCenter());
+        this.jumping = gamvas.key.isPressed(gamvas.key.SPACE); // you need to release space to allow the next jump
     }
 });
 
