@@ -47,9 +47,9 @@ enemyActor = baseActor.extend({
 footActor = gamvas.Actor.extend({
     create: function(name, x, y, playerActor) {
         this._super(name, x, y);
-        this.canJump = false;
+        this.onPlatform = false;
         this.maxJumps = 2;
-        this.jumps = this.maxJumps;
+        this.jumps = 0; // wait for platform touch
         this.player = playerActor;
         this.restitution = 0;
         this.friction = 0;
@@ -125,6 +125,25 @@ passiveActor = baseActor.extend({
 
 goalActor = passiveActor.extend({
     create: function(name, object) {
+        this._super(name, object);
+    }
+});
+
+wallActor = obstacleActor.extend({
+    create: function(name, col, height) {
+        var object = {
+            position: {
+                row: 0,
+                col: col
+            },
+            size: {
+                width: 1,
+                height: height
+            },
+            role: Common.roles.OBSTACLE,
+            string: ''
+        };
+
         this._super(name, object);
     }
 });

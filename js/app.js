@@ -1,4 +1,5 @@
 gamvas.event.addOnLoad(function() {
+    //return;
     var testlevel = '{\
 "=": "player",\n\
 "f": "obstacle",\n\

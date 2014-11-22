@@ -28,7 +28,7 @@ function Parser() {
 
     this.makeObject = function(string, col, row, role, width, height) {
         return {
-            symbol: string,
+            string: string,
             role: role,
             position: {
                 col: col,

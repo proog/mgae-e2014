@@ -26,8 +26,8 @@ baseActorState = gamvas.ActorState.extend({
         a.c.textBaseline = 'middle';
 
         // draw all symbols for this actor
-        for(var i = 0; i < this.actor.object.size.width; i++) {
-            a.c.fillText(this.actor.object.symbol[i],
+        for(var i = 0; i < this.actor.object.string.length; i++) {
+            a.c.fillText(this.actor.object.string[i],
                 startPos + Common.tileSize.width * i,
                 this.actor.position.y);
         }
@@ -72,7 +72,7 @@ baseEnemyActorState = baseActorState.extend({
         this.chaseDistanceX = 4; //number of tiles
         this.chaseDistanceY = 2;
         this.basePatrollingPositionX = this.actor.position.x;
-        this.canJump = true;
+        this.onPlatform = true;
         this.patrollingSpeed = 1.5;
         this.chasingSpeed = 3;
     },
@@ -84,11 +84,11 @@ baseEnemyActorState = baseActorState.extend({
     },
     onCollisionEnter: function(other){
         if(other.object.role == Common.roles.OBSTACLE)
-            this.actor.canJump = true;
+            this.actor.onPlatform = true;
     },
     onCollisionLeave: function(other) {
         if(other.object.role == Common.roles.OBSTACLE)
-            this.actor.canJump = false;
+            this.actor.onPlatform = false;
     }
 });
 
@@ -157,9 +157,9 @@ enemyActorChasingState = baseEnemyActorState.extend({
 
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
-        if(this.actor.canJump) {
+        if(this.actor.onPlatform) {
             jumpImpulse = this.actor.body.GetMass() * (-3 - velocity.y);
-            gamvas.state.getCurrentState().jumpSound.play();
+            gamvas.state.getCurrentState().sounds.jump.play();
         }
         var desiredVelocity = this.chasingSpeed * this.actor.direction;
 
@@ -187,19 +187,24 @@ dangerActorState = baseActorState.extend({
 
 footActorState = gamvas.ActorState.extend({
     onCollisionEnter: function(other) {
+        // reset jump allowance
         if(other.object.role == Common.roles.OBSTACLE) {
             this.actor.jumps = this.actor.maxJumps;
-            this.actor.canJump = true;
+            this.actor.onPlatform = true;
         }
     },
     onCollisionLeave: function(other) {
-
+        // decrease jump allowance when the player leaves a platform
+        if(other.object.role == Common.roles.OBSTACLE) {
+            this.actor.jumps--;
+            this.actor.onPlatform = false;
+        }
     },
     doCollide: function(other) {
         return true;
     },
     update: function(t){
-        // don't process input if player is dead
+        // just let box2d do its job if the player is dead
         if(this.actor.player.isDead)
             return;
 
@@ -207,32 +212,34 @@ footActorState = gamvas.ActorState.extend({
         var jumpImpulse = 0;
         var desiredVelocity = 0;
 
-        if(gamvas.key.isPressed(gamvas.key.SPACE) && this.actor.canJump && !this.jumping) {
-            jumpImpulse = this.actor.body.GetMass() * (-5 - velocity.y);
-            this.actor.jumps--;
-            this.actor.canJump = this.actor.jumps > 0;
-            this.jumping = true;
+        // only process input if not in a winning state, i.e. winning is like letting go of all keys
+        if(!this.actor.player.hasWon) {
+            // handle jumping
+            if(gamvas.key.isPressed(gamvas.key.SPACE) && !this.jumpKeyHeld && this.actor.jumps > 0) {
+                jumpImpulse = this.actor.body.GetMass() * (-5 - velocity.y);
 
-            gamvas.state.getCurrentState().jumpSound.play();
-        }
+                // only decrease jumps here if the player is already in mid-air, the other case is handled by onCollisionLeave
+                if(!this.actor.onPlatform)
+                    this.actor.jumps--;
 
-        if(gamvas.key.isPressed(gamvas.key.LEFT)) {
-            desiredVelocity = -5;
-            this.actor.player.direction = Common.directions.LEFT;
-        }
-        else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
-            desiredVelocity = 5;
-            this.actor.player.direction = Common.directions.RIGHT;
-        }
-        else if(!gamvas.key.isPressed(gamvas.key.LEFT) && !gamvas.key.isPressed(gamvas.key.RIGHT)) {
-            desiredVelocity = 0;
+                gamvas.state.getCurrentState().sounds.jump.play();
+            }
+
+            if(gamvas.key.isPressed(gamvas.key.LEFT)) {
+                desiredVelocity = -5;
+                this.actor.player.direction = Common.directions.LEFT;
+            }
+            else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
+                desiredVelocity = 5;
+                this.actor.player.direction = Common.directions.RIGHT;
+            }
         }
 
         var change = desiredVelocity - velocity.x;
         var impulse = this.actor.body.GetMass() * change;
         this.actor.setAwake(true);
         this.actor.body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(impulse, jumpImpulse), this.actor.body.GetWorldCenter());
-        this.jumping = gamvas.key.isPressed(gamvas.key.SPACE); // you need to release space to allow the next jump
+        this.jumpKeyHeld = gamvas.key.isPressed(gamvas.key.SPACE); // you need to release space to allow the next jump
     }
 });
 
@@ -272,10 +279,18 @@ playerActorState = baseActorState.extend({
         switch(other.object.role) {
             case Common.roles.DANGER:
             case Common.roles.ENEMY:
-                this.actor.isDead = true;
+                // only die if not in a winning state and not already dead
+                if(!this.actor.isDead && !this.actor.hasWon) {
+                    this.actor.isDead = true;
+                    gamvas.state.getCurrentState().sounds.death.play();
+                }
                 break;
             case Common.roles.GOAL:
-                this.actor.hasWon = true;
+                // only accept win if not flung into goal while dead and not hitting goal a second time
+                if(!this.actor.isDead && !this.actor.hasWon) {
+                    this.actor.hasWon = true;
+                    gamvas.state.getCurrentState().sounds.goal.play();
+                }
                 break;
         }
     },

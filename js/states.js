@@ -27,6 +27,9 @@ function createWorld(levels) {
                 goals: []
             };
 
+            this.gameObjects.obstacles.push(new wallActor('leftWall', -1, world.height));
+            this.gameObjects.obstacles.push(new wallActor('rightWall', world.width, world.height));
+
             for(var i = 0; i < objects.length; i++) {
                 switch(objects[i].role) {
                     case Common.roles.OBSTACLE:
@@ -56,15 +59,21 @@ function createWorld(levels) {
             gamvas.physics.setGravity(new gamvas.Vector2D(0, 9.81));
 
             // if this is not a restarted level, load music
-            if(!this.music)
-                this.music = this.addSound('resources/bgm.mp3');
-            this.jumpSound = this.addSound('resources/jump.mp3');
+            if(!this.sounds) {
+                this.sounds = {
+                    music: this.addSound('resources/bgm2.mp3'),
+                    jump: this.addSound('resources/jump.mp3'),
+                    death: this.addSound('resources/eek.wav'),
+                    goal: this.addSound('resources/pling.wav'),
+                    musicPlaying: false
+                };
+            }
         },
         update: function(t) {
             // play music
-            if(!this.musicPlaying && this.music.isReady()) {
-                //this.music.loop();
-                this.musicPlaying = true;
+            if(!this.sounds.musicPlaying && this.sounds.music.isReady()) {
+                //this.sounds.music.loop();
+                this.sounds.musicPlaying = true;
             }
         },
         draw: function(t) {
@@ -84,7 +93,7 @@ function createWorld(levels) {
                  }
              }
 
-            gamvas.physics.drawDebug();
+            //gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
             this.c.font = 'normal 70px consolas';
@@ -101,25 +110,34 @@ function createWorld(levels) {
 
             // handle player win
             if(this.gameObjects.player.hasWon) {
-                //this.c.fillStyle = '#00ff00';
-                //this.c.fillText('YOU WON', pos.w/2, pos.h/2);
-                this.nextLevel();
+                this.c.fillStyle = '#00ff00';
+                this.c.fillText('YOU WON', pos.w/2, pos.h/2);
+                this.c.font = 'normal 30px consolas';
+                this.c.fillText('Space to go to next level', pos.w/2, pos.h/2 + 70);
             }
         },
         onKeyDown: function(key) {
-            if(key == gamvas.key.ESCAPE && !this.gameObjects.player.isDead)
+            // pause game on esc
+            if(key == gamvas.key.ESCAPE && !this.gameObjects.player.isDead && !this.gameObjects.player.hasWon)
                 gamvas.state.setState('pause');
 
-            if(key == gamvas.key.SPACE && this.gameObjects.player.isDead) {
-                console.log('resetting world');
-                this.init();
+            // action on space
+            if(key == gamvas.key.SPACE) {
+                if(this.gameObjects.player.hasWon) {
+                    this.nextLevel();
+                }
+
+                if(this.gameObjects.player.isDead) {
+                    console.log('resetting world');
+                    this.init();
+                }
             }
         },
         enter: function() {
-            //this.music.resume();
+            this.sounds.music.resume();
         },
         leave: function() {
-            this.music.stop();
+            this.sounds.music.stop();
         },
         nextLevel: function() {
             if(this.levelIndex + 1 < this.levels.length) {
@@ -128,6 +146,8 @@ function createWorld(levels) {
             }
             else {
                 // game finished?
+                this.levelIndex = 0;
+                this.init();
             }
         }
     });
