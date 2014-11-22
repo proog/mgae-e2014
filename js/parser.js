@@ -80,6 +80,7 @@ function Parser() {
             world.height = row;
 
             var line = lines[row];
+            var expandedCol = 0;
             var currentBlock = {
                 string: null,
                 role: null,
@@ -91,9 +92,15 @@ function Parser() {
             for(var col = 0; col < line.length; col++) {
                 var char = line[col].toString();
 
+                // handle tab character as 4 spaces
+                if(char == '\t')
+                    expandedCol += 4;
+                else
+                    expandedCol += 1;
+
                 // extend world width
-                if(col > world.width)
-                    world.width = col;
+                if(expandedCol > world.width)
+                    world.width = expandedCol;
 
                 // fallback to default defs if not found in user-defined
                 var textRole = defs[char] ? defs[char].toLowerCase() : this.defaultDefinitions[char];
@@ -105,14 +112,15 @@ function Parser() {
 
                 // old or new object mode?
                 if(this.blockMode) {
-                    if(role == currentBlock.role) {
+                    // only make continuous block if obstacle
+                    if(role == currentBlock.role && role == Common.roles.OBSTACLE) {
                         // same role, extend current block
                         currentBlock.length++;
                         currentBlock.string += char;
                     }
                     else {
-                        // new role encountered, make the current block, but only if not containing ignored characters
-                        if(currentBlock.length > 0 && !this.containsIgnoredCharacters(currentBlock.string)) {
+                        // new role encountered, make the current block, but only if it has a role
+                        if(currentBlock.length > 0 && currentBlock.role != null) {
                             var object = this.makeObject(currentBlock.string, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
                             objects.push(object);
                         }
@@ -121,21 +129,21 @@ function Parser() {
                         currentBlock.string = char;
                         currentBlock.role = role;
                         currentBlock.length = 1;
-                        currentBlock.start = col;
+                        currentBlock.start = expandedCol;
                         currentBlock.row = row;
                     }
                 }
                 else {
                     // old mode with equal sized blocks
                     if(!this.containsIgnoredCharacters(char)) {
-                        var object = this.makeObject(char, col, row, role, 1, 1);
+                        var object = this.makeObject(char, expandedCol, row, role, 1, 1);
                         objects.push(object);
                     }
                 }
             }
 
             // extra check for the last block on a line
-            if(this.blockMode && currentBlock.length > 0 && !this.containsIgnoredCharacters(currentBlock.string)) {
+            if(this.blockMode && currentBlock.length > 0 && currentBlock.role != null) {
                 var object = this.makeObject(currentBlock.string, currentBlock.start, currentBlock.row, currentBlock.role, currentBlock.length, 1);
                 objects.push(object);
             }

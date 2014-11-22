@@ -4,7 +4,8 @@ gamvas.event.addOnLoad(function() {
 "=": "player",\n\
 "f": "obstacle",\n\
 "y": "danger",\n\
-"M": "enemy"\n\
+"M": "enemy",\n\
+"b": "collectible"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
@@ -15,14 +16,14 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-               M                                    T\n\
+             M   M           b            bb       T\n\
       cool platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
 \n\
 cc\n\
 \n\
    cc\n\
-   =                   M             \n\
-ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
+    =                   M                 bbbbbbbb \n\
+	ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\
 \n\

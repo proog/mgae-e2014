@@ -27,6 +27,7 @@ function createWorld(levels) {
                 goals: []
             };
 
+            // side walls
             this.gameObjects.obstacles.push(new wallActor('leftWall', -1, world.height));
             this.gameObjects.obstacles.push(new wallActor('rightWall', world.width, world.height));
 
@@ -50,6 +51,9 @@ function createWorld(levels) {
                     case Common.roles.GOAL:
                         this.gameObjects.goals.push(new goalActor('goalActor' + (this.gameObjects.goals.length), objects[i]));
                         break;
+                    case Common.roles.COLLECTIBLE:
+                        this.gameObjects.collectibles.push(new collectibleActor('collectibleActor' + (this.gameObjects.collectibles.length), objects[i]));
+                        break;
                     default:
                         this.gameObjects.obstacles.push(new obstacleActor('obstacleActor' + (this.gameObjects.obstacles.length), objects[i]));
                         break;
@@ -63,8 +67,9 @@ function createWorld(levels) {
                 this.sounds = {
                     music: this.addSound('resources/bgm2.mp3'),
                     jump: this.addSound('resources/jump.mp3'),
-                    death: this.addSound('resources/eek.wav'),
-                    goal: this.addSound('resources/pling.wav'),
+                    death: this.addSound('resources/death.wav'),
+                    goal: this.addSound('resources/goal.wav'),
+                    collectible: this.addSound('resources/collectible.wav'),
                     musicPlaying: false
                 };
             }
@@ -72,7 +77,7 @@ function createWorld(levels) {
         update: function(t) {
             // play music
             if(!this.sounds.musicPlaying && this.sounds.music.isReady()) {
-                //this.sounds.music.loop();
+                this.sounds.music.loop();
                 this.sounds.musicPlaying = true;
             }
         },
@@ -93,15 +98,25 @@ function createWorld(levels) {
                  }
              }
 
-            //gamvas.physics.drawDebug();
+            gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
-            this.c.font = 'normal 70px consolas';
+            // draw score if there are any collectibles in the level
+            if(this.gameObjects.collectibles.length > 0) {
+                this.c.textAlign = 'left';
+                this.c.font = 'normal 30px consolas';
+                this.c.fillStyle = '#000';
+                var scorePosX = 10;
+                var scorePosY = 90;
+                this.c.fillText('Score: ' + this.gameObjects.player.score + '/' + this.gameObjects.collectibles.length, scorePosX, scorePosY);
+            }
+
             this.c.textAlign = 'center';
             var pos = gamvas.getCanvasDimension();
 
             // handle player death
             if(this.gameObjects.player.isDead) {
+                this.c.font = 'normal 70px consolas';
                 this.c.fillStyle = '#ff0000';
                 this.c.fillText('YOU DIED', pos.w/2, pos.h/2);
                 this.c.font = 'normal 30px consolas';
@@ -110,6 +125,7 @@ function createWorld(levels) {
 
             // handle player win
             if(this.gameObjects.player.hasWon) {
+                this.c.font = 'normal 70px consolas';
                 this.c.fillStyle = '#00ff00';
                 this.c.fillText('YOU WON', pos.w/2, pos.h/2);
                 this.c.font = 'normal 30px consolas';

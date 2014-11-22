@@ -72,6 +72,9 @@ playerActor = baseActor.extend({
 
         this.friction = 0;
         this.restitution = 0;
+        this.isDead = false;
+        this.hasWon = false;
+        this.score = 0;
 
         this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.reducedTileSize.width,
@@ -126,6 +129,14 @@ passiveActor = baseActor.extend({
 goalActor = passiveActor.extend({
     create: function(name, object) {
         this._super(name, object);
+    }
+});
+
+collectibleActor = passiveActor.extend({
+    create: function(name, object) {
+        this._super(name, object);
+        this.collected = false;
+        this.addState(new collectibleActorState('collectible'), true);
     }
 });
 

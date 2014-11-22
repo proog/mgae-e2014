@@ -48,6 +48,13 @@ passiveActorState = baseActorState.extend({
     }
 });
 
+collectibleActorState = passiveActorState.extend({
+    draw: function(t) {
+        if(!this.actor.collected)
+            this._super(t);
+    }
+});
+
 obstacleActorState = baseActorState.extend({
     init: function() {
         this._super();
@@ -226,11 +233,11 @@ footActorState = gamvas.ActorState.extend({
             }
 
             if(gamvas.key.isPressed(gamvas.key.LEFT)) {
-                desiredVelocity = -5;
+                desiredVelocity = -3;
                 this.actor.player.direction = Common.directions.LEFT;
             }
             else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
-                desiredVelocity = 5;
+                desiredVelocity = 3;
                 this.actor.player.direction = Common.directions.RIGHT;
             }
         }
@@ -273,23 +280,33 @@ playerActorState = baseActorState.extend({
         this._super(t);
     },
     doCollide: function(other) {
+        // disregard already collected collectibles
+        if(other.object.role == Common.roles.COLLECTIBLE)
+            return false;
+
         return true;
     },
     onCollisionEnter: function(other) {
+        // only process these if the player is neither dead or winning
+        if(this.actor.isDead || this.actor.hasWon)
+            return;
+
         switch(other.object.role) {
             case Common.roles.DANGER:
             case Common.roles.ENEMY:
-                // only die if not in a winning state and not already dead
-                if(!this.actor.isDead && !this.actor.hasWon) {
-                    this.actor.isDead = true;
-                    gamvas.state.getCurrentState().sounds.death.play();
-                }
+                this.actor.isDead = true;
+                gamvas.state.getCurrentState().sounds.death.play();
                 break;
             case Common.roles.GOAL:
-                // only accept win if not flung into goal while dead and not hitting goal a second time
-                if(!this.actor.isDead && !this.actor.hasWon) {
-                    this.actor.hasWon = true;
-                    gamvas.state.getCurrentState().sounds.goal.play();
+                this.actor.hasWon = true;
+                gamvas.state.getCurrentState().sounds.goal.play();
+                break;
+            case Common.roles.COLLECTIBLE:
+                // only collect if not already collected
+                if(!other.collected) {
+                    this.actor.score++;
+                    other.collected = true;
+                    gamvas.state.getCurrentState().sounds.collectible.play();
                 }
                 break;
         }
