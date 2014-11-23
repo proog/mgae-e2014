@@ -1,7 +1,9 @@
 {
-	"G": "player",
-	"f": "obstacle",
-	"y": "danger"
+"=": "player",
+"f": "obstacle",
+"y": "danger",
+"M": "enemy",
+"b": "collectible"
 }
 
 BEGINLEVEL
@@ -12,6 +14,18 @@ BEGINLEVEL
 
 
 
+             M   M           b            bb       T
+      cool platforms  dood  ffffffff     ffffff    ff     ffffffff
+
+cc
+
+   cc
+    =                   M                 bbbbbbbb 
+	ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff
+
+
+
+BEGINLEVEL
 
 
 
@@ -20,5 +34,15 @@ BEGINLEVEL
 
 
 
-      G                T
-fffffffffffffffffffffyyyfffffffffffffffff
+  =
+
+
+
+                M          T
+             fffffff    goal!
+
+   
+ffffff  hi! jkljkffffffffffffffffffffljkl
+
+
+

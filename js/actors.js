@@ -35,6 +35,7 @@ enemyActor = baseActor.extend({
         this.friction = 0;
         this.restitution = 0;
         this.density = 10000; // this dude is really heavy
+        this.running = false;
 
         this.bodyRect(this.position.x, this.position.y,
                 this.object.size.width * Common.reducedTileSize.width,
@@ -50,6 +51,7 @@ footActor = gamvas.Actor.extend({
         this.onPlatform = false;
         this.maxJumps = 2;
         this.jumps = 0; // wait for platform touch
+        this.running = false;
         this.player = playerActor;
         this.restitution = 0;
         this.friction = 0;

@@ -1,10 +1,10 @@
 gamvas.event.addOnLoad(function() {
     //return;
     var testlevel = '{\
-"=": "player",\n\
+"G": "player",\n\
 "f": "obstacle",\n\
 "y": "danger",\n\
-"M": "enemy",\n\
+"e": "enemy",\n\
 "b": "collectible"\n\
 }\n\
 \n\
@@ -16,13 +16,13 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-             M   M           b            bb       T\n\
+             e   e           b            bb       T\n\
       cool platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
 \n\
 cc\n\
 \n\
    cc\n\
-    =                   M                 bbbbbbbb \n\
+    G                   e                 bbbbbbbb \n\
 	ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
 \n\
 \n\
@@ -36,11 +36,11 @@ BEGINLEVEL\n\
 \n\
 \n\
 \n\
-  =\n\
+  G\n\
 \n\
 \n\
 \n\
-                M          T\n\
+                e          T\n\
              fffffff    goal!\n\
 \n\
    \n\
@@ -81,8 +81,10 @@ function fileSelected(event) {
         console.log(parser.levels);
 
         var mainState = createWorld(parser.levels);
-        gamvas.state.addState(new mainState('mainGame'));
+        gamvas.state.addState(new mainState('game'));
+		gamvas.state.addState(new pauseState('pause'));
         gamvas.start('gameCanvas', true);
+		gamvas.state.setState('game');
     };
 
     reader.readAsText(file);

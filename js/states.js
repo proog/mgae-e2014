@@ -98,7 +98,7 @@ function createWorld(levels) {
                  }
              }
 
-            gamvas.physics.drawDebug();
+            //gamvas.physics.drawDebug();
         },
         postDraw: function(t) {
             // draw score if there are any collectibles in the level
@@ -107,7 +107,7 @@ function createWorld(levels) {
                 this.c.font = 'normal 30px consolas';
                 this.c.fillStyle = '#000';
                 var scorePosX = 10;
-                var scorePosY = 90;
+                var scorePosY = 30;
                 this.c.fillText('Score: ' + this.gameObjects.player.score + '/' + this.gameObjects.collectibles.length, scorePosX, scorePosY);
             }
 

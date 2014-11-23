@@ -2,6 +2,7 @@ baseActorState = gamvas.ActorState.extend({
     init: function() {
         //var state = gamvas.state.getCurrentState();
         //this.actor.setFile(state.resource.getImage('resources/tile.png'));
+        this.bobbing = false;
     },
     draw: function(t) {
         this._super(t);
@@ -29,7 +30,8 @@ baseActorState = gamvas.ActorState.extend({
         for(var i = 0; i < this.actor.object.string.length; i++) {
             a.c.fillText(this.actor.object.string[i],
                 startPos + Common.tileSize.width * i,
-                this.actor.position.y);
+                this.actor.position.y + (this.bobbing ? 1 : 0) // bobbing offset
+            );
         }
 
         a.c.restore();
@@ -70,23 +72,29 @@ obstacleActorState = baseActorState.extend({
 baseEnemyActorState = baseActorState.extend({
     init: function() {
         this._super();
-        this.timeThreshold = 3;
         this.patrollingBound = 2; //number of tiles on either side
-        this.directionX = -1;
-        this.timeSpent = 0;
-        this.speed = 40;
         this.velocity = 0;
         this.chaseDistanceX = 4; //number of tiles
         this.chaseDistanceY = 2;
         this.basePatrollingPositionX = this.actor.position.x;
         this.onPlatform = true;
         this.patrollingSpeed = 1.5;
-        this.chasingSpeed = 3;
+        this.chasingSpeed = 2;
+        this.bobDuration = 0.15;
+        this.timeSinceBob = 0;
     },
     update: function(t){
         this.target = gamvas.state.getCurrentState().gameObjects.player;
+        this.actor.running = true;
     },
     draw: function(t){
+        // handle bobbing calculation
+        this.timeSinceBob += t;
+        if(this.timeSinceBob > this.bobDuration && this.actor.onPlatform && this.actor.running) {
+            this.bobbing = !this.bobbing;
+            this.timeSinceBob = 0;
+        }
+
         this._super(t);
     },
     onCollisionEnter: function(other){
@@ -166,6 +174,7 @@ enemyActorChasingState = baseEnemyActorState.extend({
         var jumpImpulse = 0;
         if(this.actor.onPlatform) {
             jumpImpulse = this.actor.body.GetMass() * (-3 - velocity.y);
+            this.actor.running = false;
             gamvas.state.getCurrentState().sounds.jump.play();
         }
         var desiredVelocity = this.chasingSpeed * this.actor.direction;
@@ -235,10 +244,15 @@ footActorState = gamvas.ActorState.extend({
             if(gamvas.key.isPressed(gamvas.key.LEFT)) {
                 desiredVelocity = -3;
                 this.actor.player.direction = Common.directions.LEFT;
+                this.actor.running = true;
             }
             else if(gamvas.key.isPressed(gamvas.key.RIGHT)) {
                 desiredVelocity = 3;
                 this.actor.player.direction = Common.directions.RIGHT;
+                this.actor.running = true;
+            }
+            else {
+                this.actor.running = false;
             }
         }
 
@@ -262,6 +276,8 @@ playerActorState = baseActorState.extend({
             bottom: Math.floor(Math.max(this.worldDimensions.height, canvasDim.h) - (canvasDim.h / 2))
         };
         this.camera = gamvas.state.getCurrentState().camera;
+        this.bobDuration = 0.15;
+        this.timeSinceBob = 0;
     },
     update: function(t) {
         // update foot state
@@ -277,6 +293,13 @@ playerActorState = baseActorState.extend({
         this.camera.setPosition(cameraPositionX, cameraPositionY);
     },
     draw: function(t) {
+        // handle bobbing calculation
+        this.timeSinceBob += t;
+        if(this.timeSinceBob > this.bobDuration && this.actor.foot.onPlatform && this.actor.foot.running) {
+            this.bobbing = !this.bobbing;
+            this.timeSinceBob = 0;
+        }
+
         this._super(t);
     },
     doCollide: function(other) {
