@@ -1,4 +1,9 @@
+gamvas.config.preventKeyEvents = true;
+game = new mainState('game');
+
 gamvas.event.addOnLoad(function() {
+
+
     //return;
     var testlevel = '{\
 "G": "player",\n\
@@ -45,31 +50,12 @@ BEGINLEVEL\n\
 \n\
    \n\
 ffffff  hi! jkljkffffffffffffffffffffljkl\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
 \n';
 
     var parser = new Parser();
-    parser.blockMode = true;
     parser.parse(testlevel);
-    console.log(parser.levels);
-
-    var mainState = createWorld(parser.levels);
-    gamvas.state.addState(new mainState('game'));
-    gamvas.state.addState(new pauseState('pause'));
-    gamvas.start('gameCanvas', true);
-    gamvas.state.setState('game');
+    startGame(parser.levels);
 });
-
-gamvas.config.preventKeyEvents = true;
 
 function fileSelected(event) {
     var file = event.target.files[0];
@@ -78,15 +64,33 @@ function fileSelected(event) {
     reader.onload = function() {
         var parser = new Parser();
         parser.parse(reader.result);
-        console.log(parser.levels);
-
-        var mainState = createWorld(parser.levels);
-        gamvas.state.addState(new mainState('game'));
-		gamvas.state.addState(new pauseState('pause'));
-        gamvas.start('gameCanvas', true);
-		gamvas.state.setState('game');
+        startGame(parser.levels);
     };
 
     reader.readAsText(file);
 }
 
+function startGame(levels) {
+    console.log(levels);
+
+    if(!gamvas.state.getState('game')) {
+        // gamvas has not been loaded yet
+        game.loadGame(levels);
+        gamvas.state.addState(game);
+        gamvas.state.addState(new pauseState('pause'));
+        gamvas.start('gameCanvas', true);
+        gamvas.state.setState('game');
+    }
+    else {
+        // gamvas is already running and we're loading a new file
+        game.loadGame(levels);
+        game.init();
+    }
+}
+
+function clicked() {
+    var str = document.getElementById('textInput').value;
+    var parser = new Parser();
+    parser.parse(str);
+    startGame(parser.levels);
+}
