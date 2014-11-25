@@ -5,6 +5,12 @@ mainState = gamvas.State.extend({
             return;
         }
 
+        this.dustEmitter = new dustEmitter('dustemitter');
+        this.addActor(this.dustEmitter);
+
+        this.playerWoundEmitter = new playerWoundEmitter('playerwoundemitter');
+        this.addActor(this.playerWoundEmitter);
+
         // clean up leftover physics objects when restarting
         gamvas.physics.resetWorld();
 
@@ -69,7 +75,7 @@ mainState = gamvas.State.extend({
             this.sounds = {
                 music: this.addSound('resources/bgm2.mp3'),
                 jump: this.addSound('resources/jump.mp3'),
-                death: this.addSound('resources/death.wav'),
+                death: this.addSound('resources/hero_death.wav'),
                 goal: this.addSound('resources/goal.wav'),
                 collectible: this.addSound('resources/collectible.wav'),
                 musicPlaying: false
@@ -99,6 +105,10 @@ mainState = gamvas.State.extend({
                 }
              }
          }
+
+         this.dustEmitter.draw(t);
+
+         this.playerWoundEmitter.draw(t);
 
         //gamvas.physics.drawDebug();
     },

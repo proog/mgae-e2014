@@ -126,10 +126,10 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
             if(this.actor.position.x < this.basePatrollingPositionX){
                 this.actor.direction = Common.directions.RIGHT;
-                console.log("Enemy direction: RIGHT");
+                //console.log("Enemy direction: RIGHT");
             } else {
                 this.actor.direction = Common.directions.LEFT;
-                console.log("Enemy direction: LEFT");
+                //console.log("Enemy direction: LEFT");
             }
         }
 
@@ -207,6 +207,10 @@ footActorState = gamvas.ActorState.extend({
         if(other.object.role == Common.roles.OBSTACLE) {
             this.actor.jumps = this.actor.maxJumps;
             this.actor.onPlatform = true;
+            // emit dust when landing on an obstacle
+            var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
+            dustEmitter.setPosition(this.actor.position.x, this.actor.position.y);
+            dustEmitter.reset();
         }
     },
     onCollisionLeave: function(other) {
@@ -223,6 +227,13 @@ footActorState = gamvas.ActorState.extend({
         // just let box2d do its job if the player is dead
         if(this.actor.player.isDead)
             return;
+
+        // emit dust when moving on a platform
+        if(this.actor.running && this.actor.onPlatform){
+            var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
+            dustEmitter.setPosition(this.actor.position.x, this.actor.position.y);
+            dustEmitter.reset();
+        }
 
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
@@ -294,6 +305,8 @@ playerActorState = baseActorState.extend({
     },
     draw: function(t) {
         // handle bobbing calculation
+        if(this.actor.isDead)
+            return;
         this.timeSinceBob += t;
         if(this.timeSinceBob > this.bobDuration && this.actor.foot.onPlatform && this.actor.foot.running) {
             this.bobbing = !this.bobbing;
@@ -319,6 +332,8 @@ playerActorState = baseActorState.extend({
             case Common.roles.ENEMY:
                 this.actor.isDead = true;
                 gamvas.state.getCurrentState().sounds.death.play();
+                var woundEmitter = gamvas.state.getCurrentState().playerWoundEmitter;
+                woundEmitter.setPosition(this.actor.position.x, this.actor.position.y);
                 break;
             case Common.roles.GOAL:
                 this.actor.hasWon = true;
