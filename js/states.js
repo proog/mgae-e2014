@@ -11,12 +11,23 @@ mainState = gamvas.State.extend({
         this.playerWoundEmitter = new playerWoundEmitter('playerwoundemitter');
         this.addActor(this.playerWoundEmitter);
 
+        this.collectibleEmitter = new collectibleEmitter('collectibleemitter');
+        this.addActor(this.collectibleEmitter);
+
+        this.goalEmitter = new goalEmitter('goalemitter');
+        this.addActor(this.goalEmitter);
+
         // clean up leftover physics objects when restarting
         gamvas.physics.resetWorld();
 
         // for the first level
         if(typeof this.levelIndex == 'undefined')
             this.levelIndex = 0;
+
+        this.overlayAlpha = 1;
+        this.overlayDelay = 1.5;
+        this.overlayFadeInSpeed = 0.4;
+        this.overlayFadeOutSpeed = 1.2;
 
         var objects = this.levels[this.levelIndex].objects;
         var world = this.levels[this.levelIndex].world;
@@ -88,6 +99,22 @@ mainState = gamvas.State.extend({
             this.sounds.music.loop();
             this.sounds.musicPlaying = true;
         }
+
+        // celebratory particles on win
+        if(this.gameObjects.player.hasWon) {
+            this.goalEmitter.rotate(5 * t);
+        }
+
+        // fade in overlay on win and death, and fade it out on level start
+        if(this.gameObjects.player.hasWon || this.gameObjects.player.isDead) {
+            this.overlayDelay -= t;
+            if(this.overlayDelay < 0 && this.overlayAlpha < 1)
+                this.overlayAlpha += this.overlayFadeInSpeed * t;
+        }
+        else {
+            if(this.overlayAlpha > 0)
+                this.overlayAlpha -= this.overlayFadeOutSpeed * t;
+        }
     },
     draw: function(t) {
         var dimensions = gamvas.getCanvasDimension();
@@ -95,20 +122,21 @@ mainState = gamvas.State.extend({
         this.c.fillStyle = 'white';
         this.c.fillRect(pos.x - dimensions.w/2, pos.y - dimensions.h/2, dimensions.w, dimensions.h);
 
-         for(var key in this.gameObjects) {
-             if(key == 'player') {
+        for(var key in this.gameObjects) {
+            if(key == 'player') {
                 this.gameObjects.player.draw(t);
-             }
-             else {
+            }
+            else {
                 for(var i = 0; i < this.gameObjects[key].length; i++) {
                     this.gameObjects[key][i].draw(t);
                 }
-             }
-         }
+            }
+        }
 
-         this.dustEmitter.draw(t);
-
-         this.playerWoundEmitter.draw(t);
+        this.dustEmitter.draw(t);
+        this.playerWoundEmitter.draw(t);
+        this.collectibleEmitter.draw(t);
+        this.goalEmitter.draw(t);
 
         //gamvas.physics.drawDebug();
     },
@@ -126,10 +154,14 @@ mainState = gamvas.State.extend({
         this.c.textAlign = 'center';
         var pos = gamvas.getCanvasDimension();
 
+        // uses toFixed() to avoid a bug with exponentially small numbers
+        this.c.fillStyle = 'rgba(0,0,0,' + this.overlayAlpha.toFixed(3) + ')';
+        this.c.fillRect(0, 0, pos.w, pos.h);
+
         // handle player death
         if(this.gameObjects.player.isDead) {
             this.c.font = 'normal 70px consolas';
-            this.c.fillStyle = '#ff0000';
+            this.c.fillStyle = 'rgba(255,255,255,' + this.overlayAlpha + ')';
             this.c.fillText('YOU DIED', pos.w/2, pos.h/2);
             this.c.font = 'normal 30px consolas';
             this.c.fillText('Space to try again', pos.w/2, pos.h/2 + 70);
@@ -138,7 +170,7 @@ mainState = gamvas.State.extend({
         // handle player win
         if(this.gameObjects.player.hasWon) {
             this.c.font = 'normal 70px consolas';
-            this.c.fillStyle = '#00ff00';
+            this.c.fillStyle = 'rgba(255,255,255,' + this.overlayAlpha + ')';
             this.c.fillText('YOU WON', pos.w/2, pos.h/2);
             this.c.font = 'normal 30px consolas';
             this.c.fillText('Space to go to next level', pos.w/2, pos.h/2 + 70);

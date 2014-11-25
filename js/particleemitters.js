@@ -48,21 +48,42 @@ dustEmitter = gamvas.ParticleEmitter.extend({
 playerWoundEmitter = dustEmitter.extend({
 	create: function(name, x, y) {
 		this._super(name, x, y);
-        // Number of particles per emit
+
         this.setParticleLimit(50);
-
-        // emit 40 particles per second. Number of emits per second = 40 / 5 = 8 ~ emit every 125th millisecond.
         this.setParticleRate(500);
-
         this.setRotationRange(Math.PI * 2);
-
-        //Vary the speed of the particles between 10-30
         this.setParticleSpeed(110);
         this.setParticleSpeedRange(90);
-
-        // A particle is alive between Lifetime - range and Lifetime + range.
         this.setParticleLifeTime(2.5);
         this.setParticleLifeTimeRange(1.5);
     }
 });
 
+collectibleEmitter = dustEmitter.extend({
+    create: function(name, x, y) {
+        this._super(name, x, y);
+
+        this.setParticleLimit(10);
+        this.setParticleRate(500);
+        this.setRotationRange(Math.PI * 2);
+        this.setParticleSpeed(20);
+        this.setParticleSpeedRange(10);
+        this.setParticleLifeTime(1.2);
+        this.setParticleLifeTimeRange(0.5);
+    }
+});
+
+goalEmitter = dustEmitter.extend({
+    create: function(name, x, y) {
+        this._super(name, x, y);
+
+        this.setParticleLimit(2000);
+        this.setParticleRate(100);
+        this.setRotation(Math.PI);
+        this.setRotationRange(0);
+        this.setParticleSpeed(80);
+        this.setParticleSpeedRange(20);
+        this.setParticleLifeTime(5);
+        this.setParticleLifeTimeRange(1.5);
+    }
+});

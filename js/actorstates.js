@@ -224,10 +224,6 @@ footActorState = gamvas.ActorState.extend({
         return true;
     },
     update: function(t){
-        // just let box2d do its job if the player is dead
-        if(this.actor.player.isDead)
-            return;
-
         // emit dust when moving on a platform
         if(this.actor.running && this.actor.onPlatform){
             var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
@@ -239,8 +235,8 @@ footActorState = gamvas.ActorState.extend({
         var jumpImpulse = 0;
         var desiredVelocity = 0;
 
-        // only process input if not in a winning state, i.e. winning is like letting go of all keys
-        if(!this.actor.player.hasWon) {
+        // winning and dying is like letting go of all keys
+        if(!this.actor.player.hasWon && !this.actor.player.isDead) {
             // handle jumping
             if(gamvas.key.isPressed(gamvas.key.SPACE) && !this.jumpKeyHeld && this.actor.jumps > 0) {
                 jumpImpulse = this.actor.body.GetMass() * (-5 - velocity.y);
@@ -248,6 +244,10 @@ footActorState = gamvas.ActorState.extend({
                 // only decrease jumps here if the player is already in mid-air, the other case is handled by onCollisionLeave
                 if(!this.actor.onPlatform)
                     this.actor.jumps--;
+
+                var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
+                dustEmitter.setPosition(this.actor.position.x, this.actor.position.y);
+                dustEmitter.reset();
 
                 gamvas.state.getCurrentState().sounds.jump.play();
             }
@@ -304,9 +304,11 @@ playerActorState = baseActorState.extend({
         this.camera.setPosition(cameraPositionX, cameraPositionY);
     },
     draw: function(t) {
-        // handle bobbing calculation
+        // don't draw if dead
         if(this.actor.isDead)
             return;
+
+        // handle bobbing calculation
         this.timeSinceBob += t;
         if(this.timeSinceBob > this.bobDuration && this.actor.foot.onPlatform && this.actor.foot.running) {
             this.bobbing = !this.bobbing;
@@ -314,13 +316,6 @@ playerActorState = baseActorState.extend({
         }
 
         this._super(t);
-    },
-    doCollide: function(other) {
-        // disregard already collected collectibles
-        if(other.object.role == Common.roles.COLLECTIBLE)
-            return false;
-
-        return true;
     },
     onCollisionEnter: function(other) {
         // only process these if the player is neither dead or winning
@@ -337,7 +332,11 @@ playerActorState = baseActorState.extend({
                 break;
             case Common.roles.GOAL:
                 this.actor.hasWon = true;
+                this.actor.foot.running = false;
                 gamvas.state.getCurrentState().sounds.goal.play();
+                var emitter = gamvas.state.getCurrentState().goalEmitter;
+                emitter.setPosition(other.position.x, other.position.y);
+                emitter.reset();
                 break;
             case Common.roles.COLLECTIBLE:
                 // only collect if not already collected
@@ -345,6 +344,9 @@ playerActorState = baseActorState.extend({
                     this.actor.score++;
                     other.collected = true;
                     gamvas.state.getCurrentState().sounds.collectible.play();
+                    var emitter = gamvas.state.getCurrentState().collectibleEmitter;
+                    emitter.setPosition(other.position.x, other.position.y);
+                    emitter.reset();
                 }
                 break;
         }
