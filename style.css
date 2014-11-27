@@ -5,7 +5,7 @@ body {
 
 textarea {
     overflow: auto;
-    white-space: nowrap;
+    white-space: pre;
 }
 
 #gameContainer {
