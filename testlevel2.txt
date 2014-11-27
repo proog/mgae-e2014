@@ -1,0 +1,93 @@
+{
+"H": "player",
+"M": "obstacle",
+"!": "danger",
+"E": "enemy",
+"o": "collectible",
+"Y": "goal"
+}
+
+BEGINLEVEL
+
+
+H                                    oooo
+MMMMMMMMMM!!!!!!!!!MMMMMMMMM         MMMM
+
+
+
+    o       E          E
+    o   MMMMMMMMM!!!MMMMMMMMMMMMMMMMM!!!!
+    o
+    o          oo    ooo
+   MMMM        MM    MMM
+
+                 E
+!!!!!!!MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM  M
+
+   Y       MMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMM
+
+
+
+BEGINLEVEL
+
+     oo          E      M
+     oo       watchit!  M
+     oo                 M             !
+     oo                 !             !
+     oo                               !
+     UP                               M
+                                      Moo
+                        M             Moo
+                        M             CoW
+                   Way  M             MMMMMM
+                        M                     
+                        M             MMMMM
+                  ^     M                 oM      MMMM
+                        M             MMMMM
+            this        M                 !M
+                        M             MMMMM
+                        M                 oM             M
+o      H                M   Pillow    MMMMM         E    M
+MMMMMMMMMMMMM!!!!MMMMMMMMMMM!!!!!!MMMM Y      MMMMMMMMMMMM
+                                      MMMMMMMM
+
+    E     E      E       E       E      E      E     
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+
+
+BEGINLEVEL
+
+
+
+H                        
+MMMMM             MMMMMMMMMMMMMMMMMM  MMMMMMMM             MMMMMMMMMMMM
+                                                                      M
+                                     M                                M
+                    ooo        E                                      MMMM
+                 M  MMM    MMMMMMMMM                                     M
+                                                                         M
+                                                                     M
+                                                        !  o  !       
+                                                       ! ! M ! !  M   !
+                                                      !   ! !   !     !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!     !     !!!!!!!!MMMMMMM
+
+
+
+
+
+
+
+                                                                                                                                        !thanks for plaYing!
+o                                                                                                E                      E                         
+M            M               M               M     adrenaline      MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
