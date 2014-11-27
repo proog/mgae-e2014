@@ -1,5 +1,11 @@
 body {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 12px;
+}
+
+textarea {
+    overflow: auto;
+    white-space: nowrap;
 }
 
 #gameContainer {

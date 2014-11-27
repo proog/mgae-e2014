@@ -5,52 +5,35 @@ gamvas.event.addOnLoad(function() {
 
 
     //return;
-    var testlevel = '{\
-"G": "player",\n\
-"f": "obstacle",\n\
-"y": "danger",\n\
-"e": "enemy",\n\
-"b": "collectible",\n\
-"T": "goal"\n\
+    var testlevel = '{\n\
+    "H": "player",\n\
+        "^": "danger",\n\
+        "~": "enemy",\n\
+        "*": "collectible",\n\
+        "¤": "goal"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
 \n\
+Welcome to Monospace Hero!\n\
+|||||||||||||||||||||||||\n\
 \n\
+    A tool developed by\n\
+Per Mortensen &\n\
+Jacob Romme Rasmussen\n\
 \n\
+****************************************  ¤\n\
+Arrow keys to MOVE - Space to (DOUBLE) JUMP\n\
 \n\
+Load a text file to the right or\n\
+start your adventure in the text box!\n\
 \n\
+Made possible thanks to the Gamvas framework\n\
 \n\
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\
 \n\
-             e   e           b            bb       T\n\
-      cool platforms  dood  ffffffff     ffffff    ff     ffffffff\n\
-\n\
-cc\n\
-\n\
-   cc\n\
-    G                   e                 bbbbbbbb \n\
-	ffffffffff yyy fffffffffffffffffffffffffffffffffffffffff\n\
-\n\
-\n\
-\n\
-BEGINLEVEL\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-  G\n\
-\n\
-\n\
-\n\
-                e          T\n\
-             fffffff    goal!\n\
-\n\
-   \n\
-ffffff  hi! jkljkffffffffffffffffffffljkl\n\
+~            ~             ~\n\
+    --------------------------------------------\n\
 \n';
 
     var parser = new Parser();
