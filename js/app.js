@@ -1,26 +1,23 @@
-//gamvas.config.preventKeyEvents = true;
+gamvas.config.preventKeyEvents = false;
 game = new mainState('game');
 
 gamvas.event.addOnLoad(function() {
-
-
-    //return;
     var testlevel = '{\n\
     "H": "player",\n\
-        "^": "danger",\n\
-        "~": "enemy",\n\
-        "*": "collectible",\n\
-        "¤": "goal"\n\
+    "^": "danger",\n\
+    "~": "enemy",\n\
+    "*": "collectible",\n\
+    "¤": "goal"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
 \n\
         Welcome to Monospace Hero!\n\
-        |||||||||||||||||||||||||\n\
+        ||||||||||||||||||||||||||\n\
 \n\
-          A tool developed by\n\
-            Per Mortensen &\n\
-         Jacob Romme Rasmussen\n\
+           A tool developed by\n\
+             Per Mortensen &\n\
+          Jacob Romme Rasmussen\n\
 \n\
 ****************************************  ¤\n\
 Arrow keys to MOVE - Space to (DOUBLE) JUMP\n\
@@ -55,6 +52,11 @@ function fileSelected(event) {
 function runThis() {
     var str = document.getElementById('textInput').value;
     parseAndStartGame(str);
+}
+
+function trySample() {
+    document.getElementById('textInput').value = testlevel2;
+    runThis();
 }
 
 function parseAndStartGame(str) {
