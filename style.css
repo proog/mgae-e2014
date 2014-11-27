@@ -1,4 +1,5 @@
 body {
+<<<<<<< HEAD
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 12px;
 }
@@ -6,6 +7,10 @@ body {
 textarea {
     overflow: auto;
     white-space: nowrap;
+=======
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+>>>>>>> 6b39ab6d73adb3754237035deebbdaab487a7b2b
 }
 
 #gameContainer {
@@ -22,6 +27,7 @@ textarea {
 
 input, button, textarea {
     font-family: inherit;
+    font-size: inherit;
 }
 
 h1 {

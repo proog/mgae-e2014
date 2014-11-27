@@ -36,15 +36,8 @@ Made possible thanks to the Gamvas framework\n\
     --------------------------------------------\n\
 \n';
 
-    var parser = new Parser();
-    try {
-        parser.parse(testlevel);
-    } catch(e) {
-        alert(e);
-        return;
-    }
-
-    startGame(parser.levels);
+    document.getElementById('textInput').value = testlevel;
+    parseAndStartGame(testlevel);
 });
 
 function fileSelected(event) {
@@ -52,21 +45,29 @@ function fileSelected(event) {
 
     var reader = new FileReader();
     reader.onload = function() {
-        var parser = new Parser();
-        try {
-            parser.parse(reader.result);
-        } catch(e) {
-            alert(e);
-            return;
-        }
-
-        startGame(parser.levels);
+        document.getElementById('textInput').value = reader.result;
+        parseAndStartGame(reader.result);
     };
 
     reader.readAsText(file);
 }
 
-function startGame(levels) {
+function runThis() {
+    var str = document.getElementById('textInput').value;
+    parseAndStartGame(str);
+}
+
+function parseAndStartGame(str) {
+    var parser = new Parser();
+    try {
+        parser.parse(str);
+    } catch(e) {
+        alert(e);
+        return;
+    }
+
+    console.log(parser.levels);
+
     // clear file input
     var input = document.getElementById('fileInput');
     try {
@@ -77,15 +78,12 @@ function startGame(levels) {
         }
     } catch(e) {}
 
-    console.log(levels);
-
-    document.getElementById('fileInput').blur();
-    document.getElementById('runThisButton').blur();
-    document.getElementById('textInput').blur();
+    document.getElementById('gameCanvas').focus();
+    document.getElementById('gameCanvas').blur();
 
     if(!gamvas.state.getState('game')) {
         // gamvas has not been loaded yet
-        game.loadGame(levels);
+        game.loadGame(parser.levels);
         gamvas.state.addState(game);
         gamvas.state.addState(new pauseState('pause'));
         gamvas.start('gameCanvas', true);
@@ -94,20 +92,7 @@ function startGame(levels) {
     else {
         // gamvas is already running and we're loading a new file
         gamvas.state.setState('game');
-        game.loadGame(levels);
+        game.loadGame(parser.levels);
         game.init();
     }
-}
-
-function runThis() {
-    var str = document.getElementById('textInput').value;
-    var parser = new Parser();
-    try {
-        parser.parse(str);
-    } catch(e) {
-        alert(e);
-        return;
-    }
-
-    startGame(parser.levels);
 }
