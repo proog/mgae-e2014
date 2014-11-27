@@ -123,13 +123,19 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
             this.actor.setState("chasing");
             return;
         }
-        if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
+        //If the player was directly above the enemy during a chase
+        if(this.actor.direction === Common.directions.NONE)
+            if(Math.floor(Math.random()) % 2 == 0)
+                this.actor.direction = Common.directions.LEFT;
+            else
+                this.actor.direction = Common.directions.RIGHT;
+
+        //Switch direction when it reaches the patrolling bound
+        else if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
             if(this.actor.position.x < this.basePatrollingPositionX){
                 this.actor.direction = Common.directions.RIGHT;
-                //console.log("Enemy direction: RIGHT");
             } else {
                 this.actor.direction = Common.directions.LEFT;
-                //console.log("Enemy direction: LEFT");
             }
         }
 
@@ -163,6 +169,7 @@ enemyActorChasingState = baseEnemyActorState.extend({
             this.actor.getCurrentState().basePatrollingPositionX = this.actor.position.x;
             return;
         }
+
         if(this.target.position.x + Common.tileSize.width / 2 < this.actor.position.x)
             this.actor.direction = Common.directions.LEFT;
         else if(this.target.position.x - Common.tileSize.width / 2 > this.actor.position.x)
