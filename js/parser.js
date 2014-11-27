@@ -11,13 +11,6 @@ function Parser() {
         'collectible': Common.roles.COLLECTIBLE,
         'passive:': Common.roles.PASSIVE
     };
-    this.defaultDefinitions = {
-        S: 'player',
-        g: 'obstacle',
-        T: 'goal',
-        '!': 'danger',
-        E: 'enemy'
-    };
     this.ignoredCharacters = [
         ' ',
         '\r',
@@ -25,6 +18,7 @@ function Parser() {
         '\t'
     ];
     this.blockMode = true;
+    this.error = null;
 
     this.makeObject = function(string, col, row, role, width, height) {
         return {
@@ -54,13 +48,18 @@ function Parser() {
         var split = str.split(this.separator);
 
         if(split.length < 2) {
-            return;
+            throw 'Input contains no levels or no definitions. Please enter definitions as JSON and then BEGINLEVEL on a line before each level.';
         }
 
-        this.parseDefinitions(split[0]);
+        try {
+            this.parseDefinitions(split[0]);
+        } catch(e) {
+            throw 'Could not read definitions, please check JSON syntax.';
+        }
 
-        for(var i = 1; i < split.length; i++)
+        for(var i = 1; i < split.length; i++) {
             this.parseLevel(split[i], this.definitions);
+        }
     };
 
     this.parseDefinitions = function (str) {
@@ -75,12 +74,13 @@ function Parser() {
             width: 0,
             height: 0
         };
+        var playerCount = 0;
 
         for(var row = 0; row < lines.length; row++) {
-            world.height = row;
+            world.height = row + 1;
 
             var line = lines[row];
-            var expandedCol = 0;
+            var expandedCol = -1;
             var currentBlock = {
                 string: null,
                 role: null,
@@ -99,16 +99,20 @@ function Parser() {
                     expandedCol += 1;
 
                 // extend world width
-                if(expandedCol > world.width)
-                    world.width = expandedCol;
+                if(expandedCol+1 > world.width)
+                    world.width = expandedCol+1;
 
-                // fallback to default defs if not found in user-defined
-                var textRole = defs[char] ? defs[char].toLowerCase() : this.defaultDefinitions[char];
+                // fallback to obstacle if not found in user-defined
+                var textRole = defs[char] ? defs[char].toLowerCase() : 'obstacle';
 
                 // only assign a role if not an ignored character
                 var role = null;
                 if(!this.containsIgnoredCharacters(char))
                     role = this.textRoles[textRole] ? this.textRoles[textRole] : Common.roles.OBSTACLE;
+
+                // increment players count
+                if(role == Common.roles.PLAYER)
+                    playerCount++;
 
                 // old or new object mode?
                 if(this.blockMode) {
@@ -153,5 +157,11 @@ function Parser() {
             world: world,
             objects: objects
         });
+
+        // error checking
+        if(playerCount < 1)
+            throw 'One of the levels doesn\'t contain a player. Please include exactly one player in each level.';
+        else if(playerCount > 1)
+            throw 'One of the levels contains multiple players. Please include exactly one player in each level.';
     };
 }

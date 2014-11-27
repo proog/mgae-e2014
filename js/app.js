@@ -1,4 +1,4 @@
-gamvas.config.preventKeyEvents = true;
+//gamvas.config.preventKeyEvents = true;
 game = new mainState('game');
 
 gamvas.event.addOnLoad(function() {
@@ -10,7 +10,8 @@ gamvas.event.addOnLoad(function() {
 "f": "obstacle",\n\
 "y": "danger",\n\
 "e": "enemy",\n\
-"b": "collectible"\n\
+"b": "collectible",\n\
+"T": "goal"\n\
 }\n\
 \n\
 BEGINLEVEL\n\
@@ -53,7 +54,13 @@ ffffff  hi! jkljkffffffffffffffffffffljkl\n\
 \n';
 
     var parser = new Parser();
-    parser.parse(testlevel);
+    try {
+        parser.parse(testlevel);
+    } catch(e) {
+        alert(e);
+        return;
+    }
+
     startGame(parser.levels);
 });
 
@@ -63,7 +70,13 @@ function fileSelected(event) {
     var reader = new FileReader();
     reader.onload = function() {
         var parser = new Parser();
-        parser.parse(reader.result);
+        try {
+            parser.parse(reader.result);
+        } catch(e) {
+            alert(e);
+            return;
+        }
+
         startGame(parser.levels);
     };
 
@@ -71,7 +84,21 @@ function fileSelected(event) {
 }
 
 function startGame(levels) {
+    // clear file input
+    var input = document.getElementById('fileInput');
+    try {
+        input.value = '';
+        if(input.value) {
+            input.type = "text";
+            input.type = "file";
+        }
+    } catch(e) {}
+
     console.log(levels);
+
+    document.getElementById('fileInput').blur();
+    document.getElementById('runThisButton').blur();
+    document.getElementById('textInput').blur();
 
     if(!gamvas.state.getState('game')) {
         // gamvas has not been loaded yet
@@ -83,14 +110,21 @@ function startGame(levels) {
     }
     else {
         // gamvas is already running and we're loading a new file
+        gamvas.state.setState('game');
         game.loadGame(levels);
         game.init();
     }
 }
 
-function clicked() {
+function runThis() {
     var str = document.getElementById('textInput').value;
     var parser = new Parser();
-    parser.parse(str);
+    try {
+        parser.parse(str);
+    } catch(e) {
+        alert(e);
+        return;
+    }
+
     startGame(parser.levels);
 }
