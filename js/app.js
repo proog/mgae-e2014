@@ -15,25 +15,25 @@ gamvas.event.addOnLoad(function() {
 \n\
 BEGINLEVEL\n\
 \n\
-Welcome to Monospace Hero!\n\
-|||||||||||||||||||||||||\n\
+        Welcome to Monospace Hero!\n\
+        |||||||||||||||||||||||||\n\
 \n\
-    A tool developed by\n\
-Per Mortensen &\n\
-Jacob Romme Rasmussen\n\
+          A tool developed by\n\
+            Per Mortensen &\n\
+         Jacob Romme Rasmussen\n\
 \n\
 ****************************************  ¤\n\
 Arrow keys to MOVE - Space to (DOUBLE) JUMP\n\
 \n\
-Load a text file to the right or\n\
-start your adventure in the text box!\n\
+    Load a text file to the right or\n\
+   start your adventure in the text box!\n\
 \n\
 Made possible thanks to the Gamvas framework\n\
 \n\
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\
 \n\
-~            ~             ~\n\
-    --------------------------------------------\n\
+       ~            ~             ~\n\
+--------------------------------------------\n\
 \n';
 
     document.getElementById('textInput').value = testlevel;
