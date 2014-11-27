@@ -216,6 +216,7 @@ mainState = gamvas.State.extend({
     loadGame: function(levels) {
         // load levels into the game - necessary for hotswapping files
         this.levels = levels;
+        this.levelIndex = 0;
     }
 });
 
@@ -238,5 +239,7 @@ pauseState = gamvas.State.extend({
     onKeyDown: function(key) {
         if(key == gamvas.key.ESCAPE)
             gamvas.state.setState('game');
+
+        return gamvas.key.exitEvent();
     }
 });

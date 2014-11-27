@@ -1,0 +1,23 @@
+body {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+#gameContainer {
+    float: left;
+}
+
+#sideContainer {
+    float: left;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid black;
+    height: 100%;
+}
+
+input, button, textarea {
+    font-family: inherit;
+}
+
+h1 {
+    text-align: center;
+}
