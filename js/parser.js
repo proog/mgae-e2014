@@ -117,7 +117,7 @@ function Parser() {
                 // old or new object mode?
                 if(this.blockMode) {
                     // only make continuous block if obstacle
-                    if(role == currentBlock.role && role == Common.roles.OBSTACLE) {
+                    if(role == currentBlock.role && (role == Common.roles.OBSTACLE || role == Common.roles.DANGER)) {
                         // same role, extend current block
                         currentBlock.length++;
                         currentBlock.string += char;

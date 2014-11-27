@@ -9,7 +9,7 @@ Common.roles = {
     COLLECTIBLE: 7
 };
 Common.tileSize = {
-    width: 22,
+    width: 18, // original: 22
     height: 30
 };
 Common.directions = {

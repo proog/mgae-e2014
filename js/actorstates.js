@@ -180,7 +180,7 @@ enemyActorChasingState = baseEnemyActorState.extend({
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
         if(this.actor.onPlatform) {
-            jumpImpulse = this.actor.body.GetMass() * (-3 - velocity.y);
+            jumpImpulse = this.actor.body.GetMass() * (-4 - velocity.y);
             this.actor.running = false;
             gamvas.state.getCurrentState().sounds.jump.play();
         }
@@ -232,11 +232,11 @@ footActorState = gamvas.ActorState.extend({
     },
     update: function(t){
         // emit dust when moving on a platform
-        if(this.actor.running && this.actor.onPlatform){
+        /*if(this.actor.running && this.actor.onPlatform){
             var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
             dustEmitter.setPosition(this.actor.position.x, this.actor.position.y);
             dustEmitter.reset();
-        }
+        }*/
 
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
@@ -253,7 +253,7 @@ footActorState = gamvas.ActorState.extend({
                     this.actor.jumps--;
 
                 var dustEmitter = gamvas.state.getCurrentState().dustEmitter;
-                dustEmitter.setPosition(this.actor.position.x, this.actor.position.y);
+                dustEmitter.setPosition(this.actor.position.x, this.actor.position.y - Common.reducedTileSize.height/2);
                 dustEmitter.reset();
 
                 gamvas.state.getCurrentState().sounds.jump.play();
