@@ -1,5 +1,6 @@
 body {
-    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
 }
 
 #gameContainer {
@@ -16,6 +17,7 @@ body {
 
 input, button, textarea {
     font-family: inherit;
+    font-size: inherit;
 }
 
 h1 {

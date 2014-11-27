@@ -53,6 +53,7 @@ BEGINLEVEL\n\
 ffffff  hi! jkljkffffffffffffffffffffljkl\n\
 \n';
 
+    document.getElementById('textInput').value = testlevel;
     parseAndStartGame(testlevel);
 });
 
@@ -94,9 +95,8 @@ function parseAndStartGame(str) {
         }
     } catch(e) {}
 
-    document.getElementById('fileInput').blur();
-    document.getElementById('runThisButton').blur();
-    document.getElementById('textInput').blur();
+    document.getElementById('gameCanvas').focus();
+    document.getElementById('gameCanvas').blur();
 
     if(!gamvas.state.getState('game')) {
         // gamvas has not been loaded yet
