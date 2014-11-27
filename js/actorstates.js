@@ -82,6 +82,7 @@ baseEnemyActorState = baseActorState.extend({
         this.chasingSpeed = 2;
         this.bobDuration = 0.15;
         this.timeSinceBob = 0;
+        this.actor.direction = Math.floor(Math.random() * 10) % 2 == 0 ? Common.directions.LEFT : Common.directions.RIGHT;
     },
     update: function(t){
         this.target = gamvas.state.getCurrentState().gameObjects.player;
@@ -100,6 +101,8 @@ baseEnemyActorState = baseActorState.extend({
     onCollisionEnter: function(other){
         if(other.object.role == Common.roles.OBSTACLE)
             this.actor.onPlatform = true;
+        else if(other.object.role == Common.roles.ENEMY)
+            this.actor.direction = other.object.position.x > this.actor.position.x ? Common.directions.LEFT : Common.directions.RIGHT;
     },
     onCollisionLeave: function(other) {
         if(other.object.role == Common.roles.OBSTACLE)
@@ -125,10 +128,7 @@ enemyActorPatrollingState = baseEnemyActorState.extend({
         }
         //If the player was directly above the enemy during a chase
         if(this.actor.direction === Common.directions.NONE)
-            if(Math.floor(Math.random()) % 2 == 0)
-                this.actor.direction = Common.directions.LEFT;
-            else
-                this.actor.direction = Common.directions.RIGHT;
+            this.actor.direction = Math.floor(Math.random() * 10) % 2 == 0 ? Common.directions.LEFT : Common.directions.RIGHT;
 
         //Switch direction when it reaches the patrolling bound
         else if(Math.abs(this.actor.position.x - this.basePatrollingPositionX) >= this.patrollingBound * Common.tileSize.width){
