@@ -86,9 +86,9 @@ mainState = gamvas.State.extend({
             this.sounds = {
                 music: this.addSound('resources/bgm2.mp3'),
                 jump: this.addSound('resources/jump.mp3'),
-                death: this.addSound('resources/hero_death.wav'),
-                goal: this.addSound('resources/goal.wav'),
-                collectible: this.addSound('resources/collectible.wav'),
+                death: this.addSound('resources/hero_death.mp3'),
+                goal: this.addSound('resources/goal.mp3'),
+                collectible: this.addSound('resources/collectible.mp3'),
                 musicPlaying: false
             };
         }
