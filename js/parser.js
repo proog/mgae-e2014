@@ -9,7 +9,7 @@ function Parser() {
         'goal': Common.roles.GOAL,
         'enemy': Common.roles.ENEMY,
         'collectible': Common.roles.COLLECTIBLE,
-        'passive:': Common.roles.PASSIVE
+        'passive': Common.roles.PASSIVE
     };
     this.ignoredCharacters = [
         ' ',

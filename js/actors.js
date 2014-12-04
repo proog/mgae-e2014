@@ -115,7 +115,7 @@ passiveActor = baseActor.extend({
     create: function(name, object) {
         this._super(name, object);
 
-        this.addState(new baseActorState('passive'), true);
+        this.addState(new passiveActorState('passive'), true);
 
         this.friction = 0;
         this.restitution = 0;
