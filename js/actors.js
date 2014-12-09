@@ -84,6 +84,7 @@ playerActor = baseActor.extend({
                 gamvas.physics.DYNAMIC);
         this.setFixedRotation(true);
 
+        // based on sample code from http://gamvas-platformer.gopagoda.com/
         this.foot = new footActor('foot', this.position.x, this.position.y, this);
         var joint = new Box2D.Dynamics.Joints.b2RevoluteJointDef;
         joint.bodyA = this.body;

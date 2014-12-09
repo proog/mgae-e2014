@@ -238,6 +238,7 @@ footActorState = gamvas.ActorState.extend({
             dustEmitter.reset();
         }*/
 
+        // based on sample code from http://gamvas-platformer.gopagoda.com/
         var velocity = this.actor.body.GetLinearVelocity();
         var jumpImpulse = 0;
         var desiredVelocity = 0;
