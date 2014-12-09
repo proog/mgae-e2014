@@ -6,6 +6,8 @@ body {
 textarea {
     overflow: auto;
     white-space: pre;
+    height: 400px;
+    width: 100%;
 }
 
 #gameContainer {
