@@ -5,7 +5,7 @@ Monospace Hero
 
 Monospace Hero is a 2D platform game where everything in the level is represented by a textual symbol, including the player.
 
-It has no built-in levels but can parse a text file or the contents of a text box into levels for the game, meaning that your text editor is your level editor. It's a bit like running around in your .txt files! The best way to explain it is to demonstrate it, so [click here to try it out](https://permortensen.com/downloads/monospacehero/).
+It has no built-in levels but can parse a text file or the contents of a text box into levels for the game, meaning that your text editor is your level editor. It's a bit like running around in your .txt files! The best way to explain it is to demonstrate it, so [click here to try it out](https://permortensen.com/downloads/monospacehero/index.html).
 
 Monospace Hero was written in the course of a few weeks for a project in the game engines course at the IT University.
 
